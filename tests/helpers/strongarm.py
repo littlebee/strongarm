@@ -14,7 +14,7 @@ def start():
 
 def stop():
     """stops behavior subsystem"""
-    exit_code = os.system("./stop.sh src/stongarm.py")
+    exit_code = os.system("./stop.sh src/strongarm.py")
 
     # note that this only shows up when a test module fails
     print("\n Strongarm subsystem logs")

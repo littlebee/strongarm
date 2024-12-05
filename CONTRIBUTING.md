@@ -26,6 +26,11 @@ conda env export > conda_env_export.yml
 
 Uses pytest for running tests.   The tests are capable of full integration testing.  The helpers in tests/helpers,  will actually start central_hub and strongarm servers.
 
+To run all tests:
+```
+pytest tests/
+```
+
 To debug issues during testing, see also
 - logs/central_hub.py.log
 - logs/strongarm.py.log

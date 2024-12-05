@@ -33,7 +33,9 @@ def iseeu_message(websocket):
 
 async def send_message(websocket, message):
     if constants.LOG_ALL_MESSAGES:
-        log.info(f"sending {message} to {websocket.remote_address[0]}")
+        log.info(
+            f"sending {message} to {websocket.remote_address[0]}:{websocket.remote_address[1]}"
+        )
     if websocket and websocket != "all":
         await websocket.send(message)
     elif connected_sockets:  # asyncio.wait doesn't accept an empty list

@@ -42,7 +42,8 @@ async def set_angles_consumer_task():
                 await messages.send_subscribe(websocket, ["set_angles"])
 
                 log.info("creating task current_angles_provider_task")
-                await asyncio.create_task(current_angles_provider_task(websocket))
+                asyncio.create_task(current_angles_provider_task(websocket))
+                log.info("created task current_angles_provider_task")
 
                 async for message in websocket:
                     data = json.loads(message)

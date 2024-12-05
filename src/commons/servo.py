@@ -58,8 +58,7 @@ class Servo:
         self.motor_channel = motor_channel
         self.min_angle = min_angle
         self.max_angle = max_angle
-        self.destination_angle = min_angle + max_angle - min_angle / 2
-
+        self.destination_angle = min_angle + ((max_angle - min_angle) / 2)
         self.thread = threading.Thread(target=self._thread)
         self.thread.start()
 
@@ -115,11 +114,13 @@ class Servo:
         log.info(f"Starting servo movement thread. {self.current_angle}")
         self.started_at = time.time()
 
-        # need to establish initial position of motor
-        init_angle = self.min_angle + (self.max_angle - self.min_angle) / 2
-        log.info(f"initializing motor {self.motor_channel} to {init_angle}deg")
-        servo_kit.servo[self.motor_channel].angle = init_angle
+        if DEBUG_MOTORS:
+            log.info(
+                f"initializing motor {self.motor_channel} to {self.destination_angle}deg"
+            )
+        servo_kit.servo[self.motor_channel].angle = self.destination_angle
         time.sleep(0.5)
+        # need to establish initial position of motor
 
         # start running
         self.pause_event.set()
@@ -131,7 +132,7 @@ class Servo:
 
             if DEBUG_MOTORS:
                 log.info(
-                    f"thread loop: direction={direction} {self.current_angle} {self.destination_angle} "
+                    f"servo.py thread loop: direction={direction} {self.current_angle} {self.destination_angle} "
                 )
             if not self._step_move(direction):
                 if DEBUG_MOTORS:

@@ -23,6 +23,7 @@ class TestStrongarm:
         hub.send_subscribe(ws, ["current_angles"])
         hub.send(ws, {"type": "getState"})
         initial_state = hub.recv(ws)
+        print(f"{initial_state=}")
 
         # send a set_angles update to the strongarm
         hub.send_state_update(ws, {"set_angles": TEST_ANGLES_1})

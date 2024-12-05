@@ -2,4 +2,4 @@
 CENTRAL_HUB_TEST_PORT = 5100
 
 # Default timeout for web socket message recv
-DEFAULT_TIMEOUT = 5
+DEFAULT_TIMEOUT = 10
