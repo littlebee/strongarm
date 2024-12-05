@@ -1,0 +1,20 @@
+[flake8]
+; Minimal configuration for Flake8 to work with Black.
+max-line-length = 120
+
+exclude =
+  .git,
+  __pycache__,
+  docs/,
+  src/yolov5,
+  .venv
+
+extend-ignore =
+  E203,
+  E501,
+; is vs ==   (TODO: why does flake prefer is?)
+  E711, E712,
+; bare exception
+  E722,
+; unused args - I think callbacks will fail if their positional args are not present
+  U100

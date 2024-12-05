@@ -1,0 +1,57 @@
+20241205-074502 INFO: Starting server on port 5200
+20241205-074504 INFO: got new connection from 127.0.0.1:50424:
+20241205-074504 INFO: received {"type": "identity", "data": "strongarm"} from 50424
+20241205-074504 INFO: setting identity of 50424 to strongarm
+20241205-074504 INFO: sending {"type": "iseeu", "data": {"ip": "127.0.0.1"}} to 127.0.0.1
+20241205-074504 INFO: received {"type": "subscribeState", "data": ["set_angles"]} from 50424
+20241205-074504 INFO: subscribing 127.0.0.1:50424 to set_angles
+20241205-074504 INFO: received {"type": "updateState", "data": {"current_angles": [90.0, 90.0, 90.0, 90.0, 90.0, 90.0]}} from 50424
+20241205-074505 INFO: received {"type": "updateState", "data": {"current_angles": [180.0, 180.0, 180.0, 180.0, 180.0, 180.0]}} from 50424
+20241205-074647 INFO: lost connection 127.0.0.1:50424
+ERROR:websockets.server:connection handler failed
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/protocol.py", line 968, in transfer_data
+    message = await self.read_message()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/protocol.py", line 1038, in read_message
+    frame = await self.read_data_frame(max_size=self.max_size)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/protocol.py", line 1113, in read_data_frame
+    frame = await self.read_frame(max_size)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/protocol.py", line 1170, in read_frame
+    frame = await Frame.read(
+            ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/framing.py", line 69, in read
+    data = await reader(2)
+           ^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/asyncio/streams.py", line 767, in readexactly
+    raise exceptions.IncompleteReadError(incomplete, n)
+asyncio.exceptions.IncompleteReadError: 0 bytes read on a total of 2 expected bytes
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/server.py", line 236, in handler
+    await self.ws_handler(self)
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/server.py", line 1175, in _ws_handler
+    return await cast(
+           ^^^^^^^^^^^
+    ...<2 lines>...
+    )(websocket, websocket.path)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bee/projects/strongarm/./src/central_hub.py", line 173, in handleMessage
+    async for message in websocket:
+    ...<24 lines>...
+            logging.error("received unsupported message: %s", messageType)
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/protocol.py", line 497, in __aiter__
+    yield await self.recv()
+          ^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/protocol.py", line 568, in recv
+    await self.ensure_open()
+  File "/opt/anaconda3/envs/strongarm/lib/python3.13/site-packages/websockets/legacy/protocol.py", line 944, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: no close frame received or sent
