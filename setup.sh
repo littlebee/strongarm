@@ -7,7 +7,13 @@ set -x
 
 
 # servo control
-sudo pip3 install adafruit-circuitpython-servokit
+sudo pip3 install \
+    adafruit-circuitpython-servokit \
+    flask \
+    flask-cors \
+    psutil \
+    websockets==10.4 \
+    websocket-client \
 
 
 # rc.local calls start.sh

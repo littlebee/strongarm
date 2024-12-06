@@ -1,0 +1,60 @@
+@import '../vars.css';
+
+.wrapper {
+  position: relative;
+
+}
+
+.button {
+  background-color: #58e;
+  border-radius: 26px;
+  color: #000;
+  display: block;
+  font-weight: bold;
+  min-width: 190px;
+  min-height: 58px;
+  line-height: normal;
+  margin-bottom: 15px;
+  margin-right: 24px;
+  overflow: hidden;
+  padding: 20px 25px 0 0;
+  position: relative;
+  text-align: center !important;
+  text-decoration: none;
+  text-transform: uppercase;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.fader {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: var(--color-dialog-button) !important;
+  width: 100%;
+  height: 100%;
+  padding-left: 20px !important;
+}
+
+.faderSelected {
+  background-color: var(--color-dialog-button-selected) !important;
+  border-right: 5px solid #6cf;
+}
+
+.content {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+
+.fadeMessage {
+  position: absolute;
+  top: -25px;
+  left: 30px;
+  height: fit-content;
+  background-color: #6cf;
+  color: black;
+  font-size: 18px;
+}

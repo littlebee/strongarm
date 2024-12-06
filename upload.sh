@@ -10,11 +10,15 @@ fi
 
 set -x
 
-TARGET_DIR="/home/bee/brokebot"
+TARGET_DIR="/home/bee/strongarm"
 TARGET_HOST=$1
 
 rsync --progress --partial \
 --exclude=node_modules \
 --exclude=data/ \
+--exclude=logs/ \
+--exclude=*.pid \
+--exclude=__pycache__ \
+--exclude=.pytest_cache \
 --exclude=.git \
 -avz . $TARGET_HOST:$TARGET_DIR

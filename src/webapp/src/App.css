@@ -1,0 +1,58 @@
+/* LCARS overrides */
+
+.right-frame {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+h1 {
+  margin: 0px;
+}
+
+label {
+  margin-right: 8px;
+}
+
+.sidebar-buttons {
+  cursor: pointer;
+}
+
+/* convenience  */
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-grow {
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
+.padded-1 {
+  padding: 8px 12px;
+}
+
+/* App specific */
+.content {
+  height: calc(100vh - 250px);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 0 120px 25px 15px;
+}
+
+
+
+.button.selected  a {
+  background-color: #747;
+}
+
+.wrap {
+  max-width: inherit;
+}

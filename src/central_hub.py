@@ -211,8 +211,13 @@ async def send_hub_stats_task():
         await asyncio.sleep(20)
 
 
-log.info(f"Starting server on port {constants.HUB_PORT}")
-start_server = websockets.serve(handleMessage, port=constants.HUB_PORT)
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().create_task(send_hub_stats_task())
-asyncio.get_event_loop().run_forever()
+async def main():
+    log.info(f"Starting server on port {constants.HUB_PORT}")
+    async with websockets.serve(handleMessage, port=constants.HUB_PORT):
+        log.info("Starting hub stats task")
+        await send_hub_stats_task()
+        log.info("awaiting forever")
+        await asyncio.Future()  # run forever
+
+
+asyncio.run(main())

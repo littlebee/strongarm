@@ -1,0 +1,11 @@
+
+.labeledText {
+  display: flex;
+  flex-direction: row;
+}
+
+.label {
+  min-width: 100px;
+  text-align: right;
+  margin-right: 16px;
+}
