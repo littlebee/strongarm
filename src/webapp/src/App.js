@@ -14,6 +14,7 @@ import { HubStateDialog } from "./HubStateDialog";
 
 import "./lcars.css";
 import "./App.css";
+import Arm3D from "./Arm3d";
 
 function App() {
   const [hubState, setHubState] = useState(DEFAULT_HUB_STATE);
@@ -59,7 +60,9 @@ function App() {
           <div className="corner-bg">
             <div className="corner"></div>
           </div>
-          <div className="content">Hello World</div>
+          <div className="content">
+            <Arm3D />
+          </div>
         </div>
       </div>
       <HubStateDialog

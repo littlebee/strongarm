@@ -32,7 +32,7 @@ SERVO_CHANNELS = env_int("SERVO_CHANNELS", 6)
 
 
 # Connect to central hub websocket
-HUB_PORT = env_int("HUB_PORT", 5000)
+HUB_PORT = env_int("HUB_PORT", 5800)
 HUB_URI = f"ws://127.0.0.1:{HUB_PORT}/ws"
 
 LOG_ALL_MESSAGES = env_bool("LOG_ALL_MESSAGES", False)

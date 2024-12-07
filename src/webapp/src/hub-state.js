@@ -11,10 +11,12 @@ const HUB_PING_INTERVAL = 1000;
 // messages from hub.  Otherwise, we show "offline"
 const MIN_HUB_UPDATE_INTERVAL = 1500;
 
+export const HUB_PORT = process.env.HUB_PORT || 5800;
+
 export const HUB_HOST =
   !process.env.NODE_ENV || process.env.NODE_ENV === "development"
-    ? "localhost:5000"
-    : `${window.location.hostname}:5000`;
+    ? `localhost:${HUB_PORT}`
+    : `${window.location.hostname}:${HUB_PORT}`;
 
 export const HUB_URL = `ws://${HUB_HOST}/ws`;
 
