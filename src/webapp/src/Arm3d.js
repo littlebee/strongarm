@@ -128,13 +128,13 @@ const Arm3D = ({ currentAngles = [] }) => {
         }
 
         // Camera position
-        camera.position.x = -540;
-        camera.position.y = 265;
-        camera.position.z = -288;
+        camera.position.x = -400;
+        camera.position.y = 300;
+        camera.position.z = -40;
 
-        camera.lookAt(-200, 300, 0);
+        camera.lookAt(-300, 260, 0);
 
-        const _controls = new OrbitControls(camera, renderer.domElement);
+        // const _controls = new OrbitControls(camera, renderer.domElement);
 
         // Animation loop
         const animate = () => {
