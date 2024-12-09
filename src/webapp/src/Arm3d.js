@@ -4,49 +4,60 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { degToRad } from "three/src/math/MathUtils.js";
 
-const PARTS = [
+const parts = [
     {
         name: "base",
         file: "turntable-bottom.stl",
-        position: { x: 0, y: 28, z: 0 },
+        position: { x: 0, y: 0, z: 0 },
+
+        // (optional) this part is fixed in place and should not be rotated
         fixed: true,
+
+        // // (optional) this is the axis of rotation for the part
+        // rotationAxis: "x",
+
+        // // (optional) this is the center offset of the rotation axis in mm
+        // rotationOffset: 0,
+
+        // // (optional) this is the initial rotation of the part in degrees
+        // initialRotation: 0
+
+        // // (result) this is the object that will be created by the loader
+        // object: null,
     },
     {
         name: "turntable",
         file: "turntable-top.stl",
-        position: { x: 0, y: 0, z: 50 },
+        // note that this position is relative to part above center to center
+        // since the part is a child of the previous part
+        position: { x: 0, y: -27, z: 50 },
     },
     {
         name: "arm-segment-1",
         file: "140mm-arm.stl",
-        position: { x: 0, y: 200, z: 0 },
-        pivotPoint: { x: 0, y: 0, z: 0 },
-        initialRotation: { x: degToRad(-90), y: 0, z: 0 },
+        position: { x: 0, y: 0, z: 150 },
+        rotationOffset: 120,
     },
     {
         name: "arm-segment-2",
         file: "80mm-arm.stl",
-        position: { x: 0, y: 440, z: 0 },
-        initialRotation: { x: degToRad(-90), y: 0, z: 0 },
-        // pivotPoint: { x: 0, y: -50, z: 550 },
+        position: { x: 0, y: 0, z: 360 },
+        rotationOffset: 90,
     },
     {
         name: "arm-segment-3",
         file: "forearm.stl",
-        position: { x: 0, y: 600, z: 0 },
-        initialRotation: { x: degToRad(-45), y: 0, z: 0 },
-        // pivotPoint: { x: 0, y: 0, z: 0 },
+        position: { x: 0, y: 0, z: 270 },
+        initialRotation: 90,
+        rotationOffset: 50,
     },
 ];
 
-const Arm3D = () => {
+const Arm3D = ({ currentAngles = [] }) => {
     const mountRef = useRef(null);
 
     useEffect(async () => {
         const mount = mountRef.current;
-
-        // object meshs that can be rotated
-        const movables = [];
 
         // Scene setup
         const scene = new THREE.Scene();
@@ -73,47 +84,27 @@ const Arm3D = () => {
 
         // Load STL files
         const promises = [];
-        for (const part of PARTS) {
+        for (const part of parts) {
             const promise = new Promise((resolve) => {
                 loader.load(part.file, (geometry) => {
                     const mesh = new THREE.Mesh(geometry, material);
                     mesh.geometry.center();
+                    const pivot = new THREE.Object3D();
+                    // Add the mesh to the pivot
+                    pivot.add(mesh);
 
-                    let objectToAdd = mesh;
-
-                    if (part.fixed) {
-                        scene.add(objectToAdd);
+                    // Position the mesh relative to the pivot
+                    if (part.rotationOffset) {
+                        mesh.position.setZ(part.rotationOffset);
                     }
 
-                    // set the pivot point of the object
-                    if (part.pivotPoint) {
-                        objectToAdd = new THREE.Object3D();
-                        objectToAdd.add(mesh);
-                        mesh.position.set(
-                            part.pivotPoint.x,
-                            part.pivotPoint.y,
-                            part.pivotPoint.z
-                        );
-                    }
-                    // Position the arm mesh
-                    objectToAdd.position.set(
-                        part.position.x,
-                        part.position.y,
-                        part.position.z
-                    );
-
-                    // Rotate the arm mesh
+                    // Rotate the pivot instead of the mesh
                     if (part.initialRotation) {
-                        objectToAdd.rotation.set(
-                            part.initialRotation.x,
-                            part.initialRotation.y,
-                            part.initialRotation.z
+                        pivot.rotation[part.rotationAxis || "x"] = degToRad(
+                            part.initialRotation
                         );
                     }
-                    // Add to movables
-                    if (!part.fixed) {
-                        movables.push(objectToAdd);
-                    }
+                    part.object = pivot;
                     resolve();
                 });
             });
@@ -121,15 +112,20 @@ const Arm3D = () => {
         }
         await Promise.all(promises);
 
-        console.log("movables", movables);
-        // make all movable parts parent on previous part
-        // so that they move together
-        scene.add(movables[0]);
-        for (let i = 1; i < movables.length; i++) {
-            movables[i].removeFromParent();
-            movables[i - 1].attach(movables[i]);
+        const movables = [];
+        let parent = scene;
+        for (const part of parts) {
+            parent.add(part.object);
+            part.object.position.set(
+                part.position.x,
+                part.position.y,
+                part.position.z - (part.rotationOffset || 0)
+            );
+            if (!part.fixed) {
+                movables.push(part.object);
+            }
+            parent = part.object;
         }
-        movables[1].rotation.x += degToRad(45);
 
         // Camera position
         camera.position.x = -540;
@@ -143,8 +139,16 @@ const Arm3D = () => {
         // Animation loop
         const animate = () => {
             requestAnimationFrame(animate);
+            // movables.forEach((movable, index) => {
+            //     movable.rotation.x = degToRad(90 - currentAngles[index]);
+            // });
+
+            // TEMP
+            parts[2].object.rotation.x = degToRad(45);
+
             renderer.render(scene, camera);
         };
+
         animate();
 
         // Cleanup on unmount
