@@ -1,60 +1,14 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { degToRad } from "three/src/math/MathUtils.js";
 
-const parts = [
-    {
-        name: "base",
-        file: "turntable-bottom.stl",
-        position: { x: 0, y: 0, z: 0 },
-
-        // (optional) this part is fixed in place and should not be rotated
-        fixed: true,
-
-        // // (optional) this is the axis of rotation for the part
-        // rotationAxis: "x",
-
-        // // (optional) this is the center offset of the rotation axis in mm
-        // rotationOffset: 0,
-
-        // // (optional) this is the initial rotation of the part in degrees
-        // initialRotation: 0
-
-        // // (result) this is the object that will be created by the loader
-        // object: null,
-    },
-    {
-        name: "turntable",
-        file: "turntable-top.stl",
-        // note that this position is relative to part above center to center
-        // since the part is a child of the previous part
-        position: { x: 0, y: -27, z: 50 },
-    },
-    {
-        name: "arm-segment-1",
-        file: "140mm-arm.stl",
-        position: { x: 0, y: 0, z: 150 },
-        rotationOffset: 120,
-    },
-    {
-        name: "arm-segment-2",
-        file: "80mm-arm.stl",
-        position: { x: 0, y: 0, z: 360 },
-        rotationOffset: 90,
-    },
-    {
-        name: "arm-segment-3",
-        file: "forearm.stl",
-        position: { x: 0, y: 0, z: 270 },
-        initialRotation: 90,
-        rotationOffset: 50,
-    },
-];
+import { armParts } from "./armParts";
 
 const Arm3D = ({ currentAngles = [] }) => {
     const mountRef = useRef(null);
+    const parts = useRef([...armParts]);
 
     useEffect(async () => {
         const mount = mountRef.current;
@@ -84,7 +38,7 @@ const Arm3D = ({ currentAngles = [] }) => {
 
         // Load STL files
         const promises = [];
-        for (const part of parts) {
+        parts.current.forEach((part, i) => {
             const promise = new Promise((resolve) => {
                 loader.load(part.file, (geometry) => {
                     const mesh = new THREE.Mesh(geometry, material);
@@ -109,12 +63,12 @@ const Arm3D = ({ currentAngles = [] }) => {
                 });
             });
             promises.push(promise);
-        }
+        });
         await Promise.all(promises);
 
         const movables = [];
         let parent = scene;
-        for (const part of parts) {
+        for (const part of parts.current) {
             parent.add(part.object);
             part.object.position.set(
                 part.position.x,
@@ -128,9 +82,9 @@ const Arm3D = ({ currentAngles = [] }) => {
         }
 
         // Camera position
-        camera.position.x = -400;
-        camera.position.y = 300;
-        camera.position.z = -40;
+        camera.position.x = -600;
+        camera.position.y = 280;
+        camera.position.z = -60;
 
         camera.lookAt(-300, 260, 0);
 
@@ -139,12 +93,11 @@ const Arm3D = ({ currentAngles = [] }) => {
         // Animation loop
         const animate = () => {
             requestAnimationFrame(animate);
+
+            // TODO
             // movables.forEach((movable, index) => {
             //     movable.rotation.x = degToRad(90 - currentAngles[index]);
             // });
-
-            // TEMP
-            parts[2].object.rotation.x = degToRad(45);
 
             renderer.render(scene, camera);
         };

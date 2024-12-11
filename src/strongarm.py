@@ -22,8 +22,18 @@ async def send_current_angles_if_changed(websocket):
         log.info(
             f"current_angles: {current_angles} != last_sent_angles: {last_sent_angles}"
         )
-        await messages.send_state_update(websocket, {"current_angles": current_angles})
-        last_sent_angles = current_angles
+
+
+async def init_hubstate_angles(websocket):
+    current_angles = []
+    set_angles = []
+    for s in servos:
+        current_angles.append(s.current_angle)
+        set_angles.append(s.destination_angle)
+
+    await messages.send_state_update(
+        websocket, {"current_angles": current_angles, "set_angles": set_angles}
+    )
 
 
 async def current_angles_provider_task(websocket):
@@ -40,6 +50,7 @@ async def set_angles_consumer_task():
 
                 await messages.send_identity(websocket, "strongarm")
                 await messages.send_subscribe(websocket, ["set_angles"])
+                await init_hubstate_angles(websocket)
 
                 log.info("creating task current_angles_provider_task")
                 asyncio.create_task(current_angles_provider_task(websocket))

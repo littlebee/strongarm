@@ -1,0 +1,16 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.visualization {
+    min-width: 500px;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.controls {
+    min-width: 200px;
+    flex-grow: 0;
+}
