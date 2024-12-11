@@ -7,7 +7,7 @@ import {
     addHubStateUpdatedListener,
     removeHubStateUpdatedListener,
     giveTreat,
-} from "./hub-state";
+} from "./util/hubState";
 
 import { Header } from "./Header";
 import { HubStateDialog } from "./HubStateDialog";

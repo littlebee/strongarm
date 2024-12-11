@@ -4,3 +4,10 @@
     height: 100%;
     gap: 10px;
 }
+
+.textLabels {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+}

@@ -149,38 +149,6 @@ export function updateSharedState(newState) {
     webSocket.send(JSON.stringify({ type: "updateState", data: newState }));
 }
 
-export function sendThrottles(leftThrottle, rightThrottle) {
-    console.log("sending throttles", {
-        leftThrottle,
-        rightThrottle,
-    });
-
-    webSocket.send(
-        JSON.stringify({
-            type: "updateState",
-            data: {
-                throttles: {
-                    left: leftThrottle,
-                    right: rightThrottle,
-                },
-            },
-        })
-    );
-}
-
-export function giveTreat() {
-    webSocket.send(
-        JSON.stringify({
-            type: "updateState",
-            data: {
-                feeder: {
-                    requested_at: Date.now(),
-                },
-            },
-        })
-    );
-}
-
 function delayedConnectToHub(state) {
     setTimeout(() => {
         if (state.hubConnStatus === "offline") {

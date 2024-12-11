@@ -11,6 +11,6 @@
 }
 
 .controls {
-    min-width: 200px;
+    width: 300px;
     flex-grow: 0;
 }
