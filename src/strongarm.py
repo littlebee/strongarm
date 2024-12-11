@@ -18,10 +18,14 @@ last_sent_angles = [servo.current_angle for servo in servos]
 async def send_current_angles_if_changed(websocket):
     global last_sent_angles
     current_angles = [servo.current_angle for servo in servos]
-    if current_angles != last_sent_angles:
+    if any(
+        angle != last_sent_angles[index] for index, angle in enumerate(current_angles)
+    ):
         log.info(
             f"current_angles: {current_angles} != last_sent_angles: {last_sent_angles}"
         )
+        await messages.send_state_update(websocket, {"current_angles": current_angles})
+        last_sent_angles = current_angles
 
 
 async def init_hubstate_angles(websocket):
