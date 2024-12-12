@@ -25,6 +25,7 @@ export const armParts = [
         // note that this position is relative to part above center to center
         // since the part is a child of the previous part
         position: { x: 0, y: -27, z: 50 },
+        rotationAxis: "z",
     },
     {
         name: "arm-segment-1",

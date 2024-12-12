@@ -191,7 +191,7 @@ function emitUpdated() {
 }
 
 function log(...args) {
-    if (logMessages) {
-        console.log(...args);
-    }
+    // if (logMessages) {
+    console.log(...args);
+    // }
 }

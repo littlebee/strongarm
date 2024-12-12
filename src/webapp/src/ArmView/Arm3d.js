@@ -6,22 +6,24 @@ import { degToRad } from "three/src/math/MathUtils.js";
 
 import { armParts } from "./armParts";
 
+const scene = new THREE.Scene();
+let camera = null;
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+
 const Arm3D = ({ currentAngles = [] }) => {
     const mountRef = useRef(null);
     const parts = useRef([...armParts]);
 
     useEffect(async () => {
         const mount = mountRef.current;
-
-        // Scene setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
+        camera = new THREE.PerspectiveCamera(
             75,
             mount.clientWidth / mount.clientHeight,
             0.1,
             1000
         );
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+        // Scene setup
         renderer.setSize(mount.clientWidth, mount.clientHeight);
         mount.appendChild(renderer.domElement);
 
@@ -66,7 +68,6 @@ const Arm3D = ({ currentAngles = [] }) => {
         });
         await Promise.all(promises);
 
-        const movables = [];
         let parent = scene;
         for (const part of parts.current) {
             parent.add(part.object);
@@ -75,9 +76,6 @@ const Arm3D = ({ currentAngles = [] }) => {
                 part.position.y,
                 part.position.z - (part.rotationOffset || 0)
             );
-            if (!part.fixed) {
-                movables.push(part.object);
-            }
             parent = part.object;
         }
 
@@ -90,25 +88,34 @@ const Arm3D = ({ currentAngles = [] }) => {
 
         // const _controls = new OrbitControls(camera, renderer.domElement);
 
-        // Animation loop
-        const animate = () => {
-            requestAnimationFrame(animate);
-
-            // TODO
-            // movables.forEach((movable, index) => {
-            //     movable.rotation.x = degToRad(90 - currentAngles[index]);
-            // });
-
-            renderer.render(scene, camera);
-        };
-
-        animate();
-
         // Cleanup on unmount
         return () => {
             mount.removeChild(renderer.domElement);
         };
     }, []);
+
+    useEffect(() => {
+        const movables = parts.current.filter((part) => !part.fixed);
+
+        // console.log({ movables });
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+
+            movables.forEach((part, index) => {
+                if (part && part.object) {
+                    console.log("Arm3D", { index, part });
+                    part.object.rotation[part.rotationAxis || "x"] = degToRad(
+                        90 - currentAngles[index]
+                    );
+                }
+            });
+            // console.log("currentAngles", currentAngles);
+            renderer.render(scene, camera);
+        };
+
+        animate();
+    }, [currentAngles]);
 
     return <div ref={mountRef} style={{ width: "100%", height: "100%" }} />;
 };
