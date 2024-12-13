@@ -5,7 +5,7 @@ import { ArmControl } from "./ArmAngleControl";
 
 import st from "./ArmAngleControls.module.css";
 
-export function ArmAngleControls({ partNames, currentAngles, setAngles }) {
+export function ArmAngleControls({ parts, currentAngles, setAngles }) {
     const handleOnSetAngle = useCallback((angleIndex, angle) => {
         console.log("setting angle", { angleIndex, angle });
         const newAngles = [...setAngles];
@@ -14,18 +14,14 @@ export function ArmAngleControls({ partNames, currentAngles, setAngles }) {
     });
 
     const controls = useMemo(() => {
-        if (!partNames?.length) return null;
-        // console.log("ArmAngleControls", {
-        //     partNames,
-        //     currentAngles,
-        //     setAngles,
-        // });
+        if (!parts?.length) return null;
+
         const cOut = [];
-        for (let i = partNames.length - 1; i >= 0; i--) {
+        for (let i = parts.length - 1; i >= 0; i--) {
             cOut.push(
                 <ArmControl
                     key={i}
-                    name={partNames[i]}
+                    part={parts[i]}
                     currentAngle={currentAngles[i]}
                     setAngle={setAngles[i]}
                     onSetAngle={(newAngle) => handleOnSetAngle(i, newAngle)}

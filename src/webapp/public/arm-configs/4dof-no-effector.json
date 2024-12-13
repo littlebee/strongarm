@@ -50,7 +50,8 @@
                 "z": 270
             },
             "initialRotation": 45,
-            "rotationOffset": 50
+            "rotationOffset": 50,
+            "minAngle": 13
         }
     ]
 }

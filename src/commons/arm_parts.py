@@ -12,8 +12,8 @@
     - rotationOffset: (optional) default: 0; this is the center offset of the
     rotation axis in mm
     - initialRotation: (optional) default: 0; this is the initial rotation in degrees
-    - minAngle: (optional) this is the minimum angle that the part can be rotated
-    - maxAngle: (optional) this is the maximum angle that the part can be rotated
+    - v: (optional) default: 0; this is the minimum angle that the part can be rotated
+    - maxAngle: (optional) default: 180; this is the maximum angle that the part can be rotated
 
 """
 
@@ -25,6 +25,4 @@ with open("src/webapp/public/arm-configs/4dof-no-effector.json", "r") as file:
 
 # Extract the arm_parts from the JSON data
 arm_parts = data["arm_parts"]
-movable_part_names = [
-    part["name"] for part in arm_parts if not part.get("fixed", False)
-]
+movable_parts = [part for part in arm_parts if not part.get("fixed", False)]

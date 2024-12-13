@@ -10,8 +10,8 @@ const lastCurrentAngles = null;
 export function ArmView({ hubState }) {
     // console.log("ArmView", { hubState, lastCurrentAngles });
 
-    const partNames = useMemo(
-        () => hubState.arm_parts?.filter((p) => !p.fixed).map((p) => p.name),
+    const parts = useMemo(
+        () => hubState.arm_parts?.filter((p) => !p.fixed),
         [hubState.arm_parts]
     );
 
@@ -25,7 +25,7 @@ export function ArmView({ hubState }) {
             </div>
             <div className={st.controls}>
                 <ArmAngleControls
-                    partNames={partNames}
+                    parts={parts}
                     currentAngles={hubState.current_angles}
                     setAngles={hubState.set_angles}
                 />
