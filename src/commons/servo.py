@@ -42,12 +42,14 @@ def limit_angle(angle, min_angle, max_angle):
     return limited_angle
 
 
-# The servo motors & gearing for shelly-bot's neck ended up
-# being way too fast and jerky.  This is a hacky attempt
-# to slow it down to about 180deg in 3 seconds versus 1 sec
-
-
 class Servo:
+    """
+    The servo motors & gearing for shelly-bot's neck ended up being way too
+    fast and jerky.  This class uses a thread to slowly step the motor to
+    the destination angle.  The step_delay can be adjusted to speed up or slow
+    down the movement.  The thread can be paused and resumed.
+    """
+
     def __init__(self, motor_channel, min_angle=0, max_angle=180):
         self.thread = None  # background thread that steps motor to destination
         self.pause_event = threading.Event()

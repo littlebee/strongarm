@@ -5,14 +5,14 @@ import json
 import asyncio
 import websockets
 
-from commons import constants, shared_state, log
+from commons import constants, hub_state, log
 
 logging.basicConfig()
 
 connected_sockets = set()
 
 # a dictionary of sets containing sockets by top level
-# dictionary key in shared_state
+# dictionary key in hub_state
 subscribers = dict()
 
 # a dictionary of websocket to subsystem name; see handleIdentity
@@ -53,10 +53,10 @@ async def send_state_update_to_subscribers(message_data):
     relay_message = json.dumps(
         {
             "type": "stateUpdate",
-            # note that we send the message as received to any subscribers of **any** keys
-            # in the message. So if a subsystem sends updates for two keys and a client
-            # is subscribed to one of the keys, it will get both.  Provider subsystems
-            # like compass should only be responsible for update a single top level key
+            # note that we send the message as received to any subscribers
+            # of **any** keys in the message. So if a subsystem sends updates
+            # for two keys and a client is subscribed to one of the keys, it
+            # will get both keys in the stateUpdate message.
             "data": message_data,
         }
     )
@@ -65,7 +65,7 @@ async def send_state_update_to_subscribers(message_data):
 
 
 async def notify_state(websocket="all"):
-    await send_message(websocket, shared_state.serializeState())
+    await send_message(websocket, hub_state.serializeState())
 
 
 # NOTE that there is no "all" option here, need a websocket,
@@ -77,13 +77,13 @@ async def notify_iseeu(websocket):
 
 
 async def update_online_status(subsystem_name: str, status: int):
-    if subsystem_name in shared_state.state["subsystem_stats"]:
-        shared_state.state["subsystem_stats"][subsystem_name]["online"] = status
+    if subsystem_name in hub_state.state["subsystem_stats"]:
+        hub_state.state["subsystem_stats"][subsystem_name]["online"] = status
     else:
-        shared_state.state["subsystem_stats"][subsystem_name] = {"online": status}
+        hub_state.state["subsystem_stats"][subsystem_name] = {"online": status}
 
     await send_state_update_to_subscribers(
-        {"subsystem_stats": shared_state.state["subsystem_stats"]}
+        {"subsystem_stats": hub_state.state["subsystem_stats"]}
     )
 
 
@@ -117,8 +117,8 @@ async def handleStateRequest(websocket):
 async def handleStateUpdate(message_data):
     global subscribers
 
-    shared_state.update_state_from_message_data(message_data)
-    shared_state.state["hub_stats"]["state_updates_recv"] += 1
+    hub_state.update_state_from_message_data(message_data)
+    hub_state.state["hub_stats"]["state_updates_recv"] += 1
 
     await send_state_update_to_subscribers(message_data)
 
@@ -127,7 +127,7 @@ async def handleStateSubscribe(websocket, data):
     global subscribers
     subscription_keys = []
     if data == "*":
-        subscription_keys = shared_state.state.keys()
+        subscription_keys = hub_state.state.keys()
     else:
         subscription_keys = data
 
@@ -192,6 +192,7 @@ async def handleMessage(websocket, path):
             # {type: "unsubscribeState", data: [state_keys] or "*"
             elif messageType == "unsubscribeState":
                 await handleStateUnsubscribe(websocket, messageData)
+            # {type: "identity", data: "subsystem_name"}
             elif messageType == "identity":
                 await handleIdentity(websocket, messageData)
             elif messageType == "ping":
@@ -205,7 +206,7 @@ async def handleMessage(websocket, path):
 async def send_hub_stats_task():
     while True:
         await send_state_update_to_subscribers(
-            {"hub_stats": shared_state.state["hub_stats"]}
+            {"hub_stats": hub_state.state["hub_stats"]}
         )
 
         await asyncio.sleep(20)

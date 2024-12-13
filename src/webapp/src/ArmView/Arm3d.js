@@ -4,17 +4,26 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { degToRad } from "three/src/math/MathUtils.js";
 
-import { armParts } from "./armParts";
-
 const scene = new THREE.Scene();
 let camera = null;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-const Arm3D = ({ currentAngles = [] }) => {
+const Arm3D = ({ armParts, currentAngles = [] }) => {
     const mountRef = useRef(null);
-    const parts = useRef([...armParts]);
+    const parts = useMemo(() => {
+        return !armParts
+            ? null
+            : armParts.map((part) => ({
+                  threeDObject: null,
+                  part,
+              }));
+    }, [armParts]);
+
+    console.log("Arm3D", { parts });
 
     useEffect(async () => {
+        if (!parts || !currentAngles) return;
+
         const mount = mountRef.current;
         camera = new THREE.PerspectiveCamera(
             75,
@@ -40,9 +49,9 @@ const Arm3D = ({ currentAngles = [] }) => {
 
         // Load STL files
         const promises = [];
-        parts.current.forEach((part, i) => {
+        parts.forEach((part, i) => {
             const promise = new Promise((resolve) => {
-                loader.load(part.file, (geometry) => {
+                loader.load(part.part.file, (geometry) => {
                     const mesh = new THREE.Mesh(geometry, material);
                     mesh.geometry.center();
                     const pivot = new THREE.Object3D();
@@ -50,17 +59,16 @@ const Arm3D = ({ currentAngles = [] }) => {
                     pivot.add(mesh);
 
                     // Position the mesh relative to the pivot
-                    if (part.rotationOffset) {
-                        mesh.position.setZ(part.rotationOffset);
+                    if (part.part.rotationOffset) {
+                        mesh.position.setZ(part.part.rotationOffset);
                     }
 
                     // Rotate the pivot instead of the mesh
-                    if (part.initialRotation) {
-                        pivot.rotation[part.rotationAxis || "x"] = degToRad(
-                            part.initialRotation
-                        );
+                    if (part.part.initialRotation) {
+                        pivot.rotation[part.part.rotationAxis || "x"] =
+                            degToRad(part.part.initialRotation);
                     }
-                    part.object = pivot;
+                    part.threeDObject = pivot;
                     resolve();
                 });
             });
@@ -69,14 +77,14 @@ const Arm3D = ({ currentAngles = [] }) => {
         await Promise.all(promises);
 
         let parent = scene;
-        for (const part of parts.current) {
-            parent.add(part.object);
-            part.object.position.set(
-                part.position.x,
-                part.position.y,
-                part.position.z - (part.rotationOffset || 0)
+        for (const part of parts) {
+            parent.add(part.threeDObject);
+            part.threeDObject.position.set(
+                part.part.position.x,
+                part.part.position.y,
+                part.part.position.z - (part.part.rotationOffset || 0)
             );
-            parent = part.object;
+            parent = part.threeDObject;
         }
 
         // Camera position
@@ -92,22 +100,22 @@ const Arm3D = ({ currentAngles = [] }) => {
         return () => {
             mount.removeChild(renderer.domElement);
         };
-    }, []);
+    }, [parts]);
 
     useEffect(() => {
-        const movables = parts.current.filter((part) => !part.fixed);
+        if (!parts || !currentAngles) return;
 
+        const movables = parts.filter((part) => !part.part.fixed);
         // console.log({ movables });
 
         const animate = () => {
             requestAnimationFrame(animate);
 
             movables.forEach((part, index) => {
-                if (part && part.object) {
-                    console.log("Arm3D", { index, part });
-                    part.object.rotation[part.rotationAxis || "x"] = degToRad(
-                        90 - currentAngles[index]
-                    );
+                if (part && part.threeDObject) {
+                    // console.log("Arm3D", { index, part });
+                    part.threeDObject.rotation[part.part.rotationAxis || "x"] =
+                        degToRad(90 - currentAngles[index]);
                 }
             });
             // console.log("currentAngles", currentAngles);
@@ -115,7 +123,7 @@ const Arm3D = ({ currentAngles = [] }) => {
         };
 
         animate();
-    }, [currentAngles]);
+    }, [parts, currentAngles]);
 
     return <div ref={mountRef} style={{ width: "100%", height: "100%" }} />;
 };

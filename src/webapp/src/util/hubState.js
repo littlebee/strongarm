@@ -24,7 +24,7 @@ export const DEFAULT_HUB_STATE = {
     // this is for the UI only
     hubConnStatus: "offline",
 
-    // the keys below are shared from central hub.  See shared_state.py
+    // the keys below are shared from central hub.  See hub_state.py
 
     // provided by central_hub/
     hub_stats: { state_updates_recv: 0 },
