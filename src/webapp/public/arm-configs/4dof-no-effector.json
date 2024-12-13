@@ -1,0 +1,56 @@
+{
+    "description": "This is a list of parts that make up the arm. Each part is a dictionary with the following keys:\n\n- name: (required) a name for display purposes\n- file: (required) this is the name of the 3d file that lives in webapp/public\n- position: (required) this is the position of the part relative to the part above it, in mm\n- fixed: (optional) default: false; this part does not move\n- rotationAxis: (optional) default: \"x\";  this is the axis of rotation\n- rotationOffset: (optional) default: 0; this is the center offset of the rotation axis in mm\n- initialRotation: (optional) default: 0; this is the initial rotation in degrees\n- minAngle: (optional) this is the minimum angle that the part can be rotated\n- maxAngle: (optional) this is the maximum angle that the part can be rotated",
+    "arm_parts": [
+        {
+            "name": "base",
+            "file": "turntable-bottom.stl",
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "fixed": true
+        },
+        {
+            "name": "turntable",
+            "file": "turntable-top.stl",
+            "position": {
+                "x": 0,
+                "y": -27,
+                "z": 50
+            },
+            "rotationAxis": "z"
+        },
+        {
+            "name": "arm-segment-1",
+            "file": "140mm-arm.stl",
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 150
+            },
+            "rotationOffset": 120
+        },
+        {
+            "name": "arm-segment-2",
+            "file": "80mm-arm.stl",
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 360
+            },
+            "rotationOffset": 90
+        },
+        {
+            "name": "arm-segment-3",
+            "file": "forearm.stl",
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 270
+            },
+            "initialRotation": 45,
+            "rotationOffset": 50
+        }
+    ]
+}
