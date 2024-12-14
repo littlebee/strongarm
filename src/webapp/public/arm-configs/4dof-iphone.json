@@ -1,5 +1,5 @@
 {
-    "description": "Bare bones 4dof arm",
+    "description": "4dof arm with iPhone pan and tilt holder",
     "arm_parts": [
         {
             "name": "base",
@@ -68,6 +68,60 @@
                 "z": 50
             },
             "minAngle": 13
+        },
+        {
+            "name": "pan-tilt-base",
+            "file": "pan-tilt-base.stl",
+            "fixed": true,
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 130
+            },
+            "initialRotation": {
+                "x": 0,
+                "y": 0,
+                "z": 90
+            }
+        },
+        {
+            "name": "pan-tilt-rotator",
+            "file": "pan-tilt-rotator.stl",
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 50
+            },
+            "initialRotation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "rotationOffset": {
+                "x": 0,
+                "y": 0,
+                "z": 50
+            }
+        },
+        {
+            "name": "iphone-holder",
+            "file": "iphone-holder.stl",
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 130
+            },
+            "initialRotation": {
+                "x": 0,
+                "y": 0,
+                "z": -90
+            },
+            "rotationAxis": "z",
+            "rotationOffset": {
+                "x": 0,
+                "y": -20,
+                "z": 0
+            }
         }
     ]
 }
