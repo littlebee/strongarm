@@ -26,6 +26,10 @@
     align-items: baseline;
 }
 
+.grabber {
+    cursor: grab;
+}
+
 .angleInput {
     width: 70px;
     height: 35px;

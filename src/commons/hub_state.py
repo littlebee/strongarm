@@ -2,7 +2,6 @@ import time
 import json
 
 from commons import log
-from commons.arm_parts import arm_parts, movable_parts
 
 state = {
     # provided by central_hub/
@@ -13,8 +12,21 @@ state = {
     "current_angles": [],
     # centralized config
     "config": {"min_servo_angle": 0, "max_servo_angle": 180},
+    # which subsystems are online and have indentified themselves
     "subsystem_stats": {},
-    "arm_parts": arm_parts,
+    # array of json file names provided to central hub
+    # by arms_config_provider
+    "arm_config_files": [],
+    # initially by arms_config_provider to last selected, can be changed
+    # to any of the arm_configs
+    "arm_config_selected": "",
+    # currently selected arm config provided by arms_config_provider
+    "arm_config": {
+        "filename": None,
+        "updated_at": None,
+        # the arm ports associated with selected arm configuration
+        "arm_parts": [],
+    },
 }
 
 log.info(f"initial state: {state}")
@@ -25,6 +37,10 @@ def serializeState():
 
 
 def update_state_from_message_data(message_data):
+    movable_parts = [
+        part for part in state.get("arm_parts", []) if part.get("fixed") is False
+    ]
+
     for key in message_data:
         data = message_data[key]
         if key == "set_angles":

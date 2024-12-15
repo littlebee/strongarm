@@ -19,8 +19,6 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
               }));
     }, [armParts]);
 
-    console.log("Arm3D", { parts });
-
     useEffect(async () => {
         if (!parts || !currentAngles) return;
 
@@ -124,13 +122,7 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
 
             movables.forEach((part, index) => {
                 if (part && part.threeDObject) {
-                    // console.log("Arm3D", { index, part });
                     const axis = part.part.rotationAxis || "x";
-                    console.log("arm3d", {
-                        axis,
-                        init: part.part.initialRotation?.[axis],
-                        current: currentAngles[index],
-                    });
                     part.threeDObject.rotation[axis] = degToRad(
                         90 -
                             currentAngles[index] +
@@ -138,7 +130,6 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
                     );
                 }
             });
-            // console.log("currentAngles", currentAngles);
             renderer.render(scene, camera);
         };
 

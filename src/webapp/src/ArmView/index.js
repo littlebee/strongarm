@@ -11,15 +11,15 @@ export function ArmView({ hubState }) {
     // console.log("ArmView", { hubState, lastCurrentAngles });
 
     const parts = useMemo(
-        () => hubState.arm_parts?.filter((p) => !p.fixed),
-        [hubState.arm_parts]
+        () => hubState.arm_config.arm_parts?.filter((p) => !p.fixed),
+        [hubState.arm_config.arm_parts]
     );
 
     return (
         <div className={st.container}>
             <div className={st.visualization}>
                 <Arm3D
-                    armParts={hubState.arm_parts}
+                    armParts={hubState.arm_config.arm_parts}
                     currentAngles={hubState.current_angles}
                 />
             </div>

@@ -4,6 +4,7 @@ import st from "./ArmAngleControl.module.css";
 
 export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
     const [grabberSelected, setGrabberSelected] = useState(false);
+    const [grabberHovered, setGrabberHovered] = useState(false);
     const [changingAngle, setChangingAngle] = useState(null);
     const svgRef = useRef(null);
 
@@ -93,7 +94,7 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                     strokeWidth="10"
                 />
                 <rect
-                    className="grabber"
+                    className={st.grabber}
                     x="0"
                     y="90"
                     height="20"
@@ -103,8 +104,10 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                     transform={`rotate(${translateAngle(
                         currentAngle
                     )} 100 100)`}
-                    opacity={grabberSelected ? 1 : 0.5}
+                    opacity={grabberSelected ? 1 : grabberHovered ? 0.8 : 0.5}
                     onMouseDown={handleGrabberMouseDown}
+                    onMouseEnter={() => setGrabberHovered(true)}
+                    onMouseLeave={() => setGrabberHovered(false)}
                 />
                 <line
                     x1="55"

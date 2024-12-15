@@ -35,6 +35,22 @@ export const DEFAULT_HUB_STATE = {
     // centralized config
     config: { min_servo_angle: 0, max_servo_angle: 180 },
 
+    // array of json file names provided to central hub
+    // by arms_config_provider
+    arm_config_files: [],
+
+    // initially by arms_config_provider to last selected, can be changed
+    // to any of the arm_configs
+    arm_config_selected: "",
+
+    // currently selected arm config provided by
+    // arms_config_provider
+    arm_config: {
+        filename: "",
+        description: "",
+        arm_parts: [],
+    },
+
     subsystem_stats: {},
 };
 
@@ -127,7 +143,7 @@ export function addHubStateUpdatedListener(handler) {
 }
 
 export function removeHubStateUpdatedListener(handler) {
-    const index = onUpdateCallbacks.indexOf(item);
+    const index = onUpdateCallbacks.indexOf(handler);
     if (index !== -1) {
         onUpdateCallbacks.splice(index, 1);
     }
@@ -191,7 +207,7 @@ function emitUpdated() {
 }
 
 function log(...args) {
-    // if (logMessages) {
-    console.log(...args);
-    // }
+    if (logMessages) {
+        console.log(...args);
+    }
 }

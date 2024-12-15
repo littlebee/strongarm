@@ -70,7 +70,6 @@ class webapp:
         app.run(host="0.0.0.0", port=80, threaded=True)
 
     def start_thread(self):
-        # Define a thread for FPV and OpenCV
         thread = threading.Thread(target=self.thread)
         # 'True' means it is a front thread,it would close when the mainloop() closes
         thread.setDaemon(False)

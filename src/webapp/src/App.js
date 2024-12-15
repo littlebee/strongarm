@@ -15,6 +15,7 @@ import { HubStateDialog } from "./HubStateDialog";
 import "./lcars.css";
 import "./App.css";
 import { ArmView } from "./ArmView";
+import MenuLeft from "./MenuLeft";
 
 function App() {
     const [hubState, setHubState] = useState(DEFAULT_HUB_STATE);
@@ -31,8 +32,6 @@ function App() {
         setHubState({ ...newState });
     };
 
-    const handleResetAllAnglesClick = () => {};
-
     return (
         <div>
             <Header
@@ -43,11 +42,8 @@ function App() {
             <div className="wrap">
                 <div className="left-frame" id="gap">
                     <div className="sidebar-buttons">
-                        <a onClick={handleResetAllAnglesClick}>
-                            Reset All Angles
-                        </a>
+                        <MenuLeft hubState={hubState} />
                     </div>
-                    <div className="panel-3"></div>
                 </div>
                 <div className="right-frame">
                     <div className="bar-panel">

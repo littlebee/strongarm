@@ -6,6 +6,11 @@
     margin-top: 10px;
 }
 
+.left-frame {
+    justify-content: initial;
+    padding-top: 50px;
+}
+
 h1 {
     margin: 0px;
 }
@@ -16,6 +21,13 @@ label {
 
 .sidebar-buttons {
     cursor: pointer;
+    height: 100%;
+    /* TODO : this is for the "HUB STATE" button and should be moved there */
+    min-height: 138px;
+}
+
+.sidebar-buttons a {
+    border-bottom: 1px solid #000;
 }
 
 /* convenience  */
