@@ -14,7 +14,7 @@ sudo pip3 install \
     psutil \
     websockets==10.4 \
     websocket-client \
-    watchdog \
+    watchfiles \
 
 
 # rc.local calls start.sh
