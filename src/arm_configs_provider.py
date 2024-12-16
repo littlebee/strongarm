@@ -7,11 +7,8 @@ import time
 import traceback
 import websockets
 
-# from watchdog.observers import Observer
-# from watchdog.events import FileSystemEventHandler
-# from hachiko.hachiko import AIOWatchdog, AIOEventHandler
-
-from watchfiles import awatch
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 from commons import constants as c, messages, log
 
@@ -21,11 +18,6 @@ ARM_CONFIGS_DIR = "./src/webapp/public/arm-configs"
 
 arm_config_files = []
 current_arm_config = None
-
-
-async def file_watcher(websocket):
-    async for changes in awatch("/path/to/dir"):
-        log.info(changes)
 
 
 def load_arm_config_filenames():
@@ -39,6 +31,11 @@ async def send_arm_config_filenames(websocket):
     global arm_config_files
     log.info(f"sending arm_config_files: {arm_config_files}")
     await messages.send_state_update(websocket, {"arm_config_files": arm_config_files})
+
+
+async def load_and_send_arm_config_filenames(websocket):
+    load_arm_config_filenames()
+    await send_arm_config_filenames(websocket)
 
 
 async def initialize_arm_configs():
@@ -71,6 +68,11 @@ async def send_arm_config(websocket):
     await messages.send_state_update(websocket, {"arm_config": current_arm_config})
 
 
+async def load_and_send_arm_config(websocket, arm_config_json_file):
+    await load_arm_config(arm_config_json_file)
+    await send_arm_config(websocket)
+
+
 async def send_selected_arm_config(websocket):
     global current_arm_config
     log.info(f"sending selected arm_config: {current_arm_config["filename"]}")
@@ -80,7 +82,6 @@ async def send_selected_arm_config(websocket):
 
 
 async def consumer_task():
-    fileWatch = None
     while True:
         try:
             log.info(f"connecting to {c.HUB_URI}")
@@ -93,23 +94,24 @@ async def consumer_task():
                 await send_arm_config(websocket)
                 await send_selected_arm_config(websocket)
 
-                # class FileChangeHandler(AIOEventHandler):
-                #     async def on_created(self, event):
-                #         global current_arm_config
-                #         log.info(f"FileChangeHandler: {event}")
-                #         if event.is_directory:
-                #             await load_arm_config_filenames()
-                #             await send_arm_config_filenames(websocket)
-                #         else:
-                #             # extract base filename from event
-                #             filename = os.path.basename(event.src_path)
-                #             if filename == current_arm_config["filename"]:
-                #                 await load_arm_config(filename)
-                #                 await send_arm_config(websocket)
+                class FileChangeHandler(FileSystemEventHandler):
+                    def on_modified(self, event):
+                        global current_arm_config
+                        if event.is_directory:
+                            log.info(f"directory modified: {event.src_path}")
+                            asyncio.run(load_and_send_arm_config_filenames(websocket))
+                        else:
+                            filename = os.path.basename(event.src_path)
+                            if filename == current_arm_config["filename"]:
+                                log.info(f"current arm config modified: {filename}")
+                                asyncio.run(
+                                    load_and_send_arm_config(websocket, filename)
+                                )
 
-                # event_handler = FileChangeHandler()
-                # fileWatch = AIOWatchdog(ARM_CONFIGS_DIR, event_handler)
-                # fileWatch.start()
+                event_handler = FileChangeHandler()
+                observer = Observer()
+                observer.schedule(event_handler, path=ARM_CONFIGS_DIR, recursive=True)
+                observer.start()
 
                 async for message in websocket:
                     data = json.loads(message)
@@ -120,6 +122,9 @@ async def consumer_task():
                         if "arm_config_selected" in message_data:
                             arm_config_selected = message_data["arm_config_selected"]
                             if arm_config_selected != current_arm_config["filename"]:
+                                log.info(
+                                    f"changing arm_config from {current_arm_config['filename']} to {arm_config_selected}"
+                                )
                                 await load_arm_config(arm_config_selected)
                                 await send_arm_config(websocket)
 
@@ -129,8 +134,6 @@ async def consumer_task():
 
         except:
             traceback.print_exc()
-
-        fileWatch and fileWatch.stop()
 
         print("socket disconnected.  Reconnecting in 5 sec...")
         time.sleep(5)

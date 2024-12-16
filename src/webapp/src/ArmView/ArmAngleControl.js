@@ -75,7 +75,7 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                             min={part.minAngle || 0}
                             max={part.maxAngle || 180}
                             className={st.angleInput}
-                            value={changingAngle || setAngle.toFixed(0)}
+                            value={changingAngle || setAngle?.toFixed(0) || 90}
                             onChange={handleAngleInputChange}
                             onBlur={handleAngleInputBlur}
                             onKeyDown={handleAngleInputKeyDown}
@@ -117,7 +117,9 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                     fill="none"
                     stroke="#ffff00"
                     strokeWidth="1"
-                    transform={`rotate(${translateAngle(setAngle)} 100 100)`}
+                    transform={`rotate(${translateAngle(
+                        setAngle || 90
+                    )} 100 100)`}
                 />
             </svg>
         </div>

@@ -32,7 +32,7 @@ def iseeu_message(websocket):
 
 
 async def send_message(websocket, message):
-    if constants.LOG_ALL_MESSAGES:
+    if constants.LOG_ALL_MESSAGES and message != '{"type": "pong"}':
         log.info(
             f"sending {message} to {websocket.remote_address[0]}:{websocket.remote_address[1]}"
         )
@@ -102,8 +102,9 @@ async def unregister(websocket):
         connected_sockets.remove(websocket)
         for key in subscribers:
             subscribers[key].remove(websocket)
-
         subsystem_name = identities.pop(websocket, None)
+        websocket.close()
+
         await update_online_status(subsystem_name, 0)
 
     except:
@@ -173,12 +174,12 @@ async def handleMessage(websocket, path):
     await register(websocket)
     try:
         async for message in websocket:
-            if constants.LOG_ALL_MESSAGES:
-                log.info(f"received {message} from {websocket.remote_address[1]}")
-
             jsonData = json.loads(message)
             messageType = jsonData.get("type")
             messageData = jsonData.get("data")
+
+            if constants.LOG_ALL_MESSAGES and messageType != "ping":
+                log.info(f"received {message} from {websocket.remote_address[1]}")
 
             # {type: "state"}
             if messageType == "getState":
