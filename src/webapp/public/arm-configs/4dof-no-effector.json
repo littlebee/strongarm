@@ -1,5 +1,5 @@
 {
-    "description": "Bare bones AF 4dof arm",
+    "description": "Bare bones 4dof arm",
     "arm_parts": [
         {
             "name": "base",

@@ -103,10 +103,8 @@ async def unregister(websocket):
         for key in subscribers:
             subscribers[key].remove(websocket)
         subsystem_name = identities.pop(websocket, None)
-        websocket.close()
 
         await update_online_status(subsystem_name, 0)
-
     except:
         pass
 
@@ -202,23 +200,23 @@ async def handleMessage(websocket, path):
                 logging.error("received unsupported message: %s", messageType)
     finally:
         await unregister(websocket)
+        await websocket.close()
 
 
-async def send_hub_stats_task():
-    while True:
-        await send_state_update_to_subscribers(
-            {"hub_stats": hub_state.state["hub_stats"]}
-        )
+# async def send_hub_stats_task():
+#     while True:
+#         await send_state_update_to_subscribers(
+#             {"hub_stats": hub_state.state["hub_stats"]}
+#         )
 
-        await asyncio.sleep(20)
+#         await asyncio.sleep(20)
 
 
 async def main():
     log.info(f"Starting server on port {constants.HUB_PORT}")
     async with websockets.serve(handleMessage, port=constants.HUB_PORT):
-        log.info("Starting hub stats task")
-        await send_hub_stats_task()
-        log.info("awaiting forever")
+        # log.info("Starting hub stats task")
+        # await send_hub_stats_task()
         await asyncio.Future()  # run forever
 
 

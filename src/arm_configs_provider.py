@@ -18,6 +18,7 @@ ARM_CONFIGS_DIR = "./src/webapp/public/arm-configs"
 
 arm_config_files = []
 current_arm_config = None
+connected_socket = None
 
 
 def load_arm_config_filenames():
@@ -82,6 +83,7 @@ async def send_selected_arm_config(websocket):
 
 
 async def consumer_task():
+    global connected_socket
     while True:
         try:
             log.info(f"connecting to {c.HUB_URI}")
@@ -94,24 +96,7 @@ async def consumer_task():
                 await send_arm_config(websocket)
                 await send_selected_arm_config(websocket)
 
-                class FileChangeHandler(FileSystemEventHandler):
-                    def on_modified(self, event):
-                        global current_arm_config
-                        if event.is_directory:
-                            log.info(f"directory modified: {event.src_path}")
-                            asyncio.run(load_and_send_arm_config_filenames(websocket))
-                        else:
-                            filename = os.path.basename(event.src_path)
-                            if filename == current_arm_config["filename"]:
-                                log.info(f"current arm config modified: {filename}")
-                                asyncio.run(
-                                    load_and_send_arm_config(websocket, filename)
-                                )
-
-                event_handler = FileChangeHandler()
-                observer = Observer()
-                observer.schedule(event_handler, path=ARM_CONFIGS_DIR, recursive=True)
-                observer.start()
+                connected_socket = websocket
 
                 async for message in websocket:
                     data = json.loads(message)
@@ -135,8 +120,36 @@ async def consumer_task():
         except:
             traceback.print_exc()
 
+        if connected_socket:
+            connected_socket.close()
+            connected_socket = None
+
         print("socket disconnected.  Reconnecting in 5 sec...")
         time.sleep(5)
+
+
+class FileChangeHandler(FileSystemEventHandler):
+    def on_modified(self, event):
+        global connected_socket
+        global current_arm_config
+
+        if not connected_socket:
+            return
+
+        if event.is_directory:
+            log.info(f"directory modified: {event.src_path}")
+            asyncio.run(load_and_send_arm_config_filenames(connected_socket))
+        else:
+            filename = os.path.basename(event.src_path)
+            if filename == current_arm_config["filename"]:
+                log.info(f"current arm config modified: {filename}")
+                asyncio.run(load_and_send_arm_config(connected_socket, filename))
+
+
+event_handler = FileChangeHandler()
+observer = Observer()
+observer.schedule(event_handler, path=ARM_CONFIGS_DIR, recursive=True)
+observer.start()
 
 
 asyncio.run(consumer_task())

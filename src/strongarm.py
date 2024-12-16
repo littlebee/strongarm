@@ -14,6 +14,8 @@ for i in range(c.SERVO_CHANNELS):
 
 last_sent_angles = [servo.current_angle for servo in servos]
 
+connected_socket = None
+
 
 async def send_current_angles_if_changed(websocket):
     global last_sent_angles
@@ -40,25 +42,23 @@ async def init_hubstate_angles(websocket):
     )
 
 
-async def current_angles_provider_task(websocket):
+async def current_angles_provider_task():
     while True:
-        await send_current_angles_if_changed(websocket)
-        await asyncio.sleep(0.05)
+        if connected_socket:
+            await send_current_angles_if_changed(connected_socket)
+        await asyncio.sleep(0.1)
 
 
 async def set_angles_consumer_task():
+    global connected_socket
     while True:
         try:
             log.info(f"connecting to {c.HUB_URI}")
             async with websockets.connect(c.HUB_URI) as websocket:
-
                 await messages.send_identity(websocket, "strongarm")
                 await messages.send_subscribe(websocket, ["set_angles"])
                 await init_hubstate_angles(websocket)
-
-                log.info("creating task current_angles_provider_task")
-                asyncio.create_task(current_angles_provider_task(websocket))
-                log.info("created task current_angles_provider_task")
+                connected_socket = websocket
 
                 async for message in websocket:
                     data = json.loads(message)
@@ -73,8 +73,22 @@ async def set_angles_consumer_task():
         except:
             traceback.print_exc()
 
+        if connected_socket:
+            connected_socket.close()
+            connected_socket = None
+
         print("socket disconnected.  Reconnecting in 5 sec...")
         time.sleep(5)
 
 
-asyncio.run(set_angles_consumer_task())
+async def main():
+    log.info("creating task current_angles_provider_task")
+    t1 = asyncio.create_task(current_angles_provider_task())
+    log.info("created task current_angles_provider_task")
+    t2 = asyncio.create_task(set_angles_consumer_task())
+
+    # Wait for all tasks to complete
+    await asyncio.gather(t1, t2)
+
+
+asyncio.run(main())
