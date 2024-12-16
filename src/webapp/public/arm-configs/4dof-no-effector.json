@@ -9,6 +9,11 @@
                 "y": 0,
                 "z": 0
             },
+            "initialRotation": {
+                "x": -90,
+                "y": 0,
+                "z": 0
+            },
             "fixed": true
         },
         {

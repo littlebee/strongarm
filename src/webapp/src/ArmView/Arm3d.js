@@ -27,12 +27,13 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
             75,
             mount.clientWidth / mount.clientHeight,
             0.1,
-            1000
+            5000
         );
 
         // Scene setup
+        scene.clear();
         renderer.setSize(mount.clientWidth, mount.clientHeight);
-        mount.appendChild(renderer.domElement);
+        mount.replaceChildren(renderer.domElement);
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0x666666);
@@ -43,7 +44,6 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
 
         const loader = new STLLoader();
         const material = new THREE.MeshStandardMaterial({ color: 0xff5533 });
-        scene.rotateX((Math.PI / 2) * -1);
 
         // Load STL files
         const promises = [];
@@ -95,14 +95,14 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
         }
 
         // Camera position
-        camera.position.x = -600;
-        camera.position.y = 280;
-        camera.position.z = -60;
+        camera.position.x = -700;
+        camera.position.y = 300;
+        camera.position.z = 200;
 
         // camera.lookAt(-300, 260, 0);
 
         const controls = new OrbitControls(camera, renderer.domElement);
-        controls.target.set(-500, 280, 0);
+        controls.target.set(-200, 260, 300);
         controls.update();
 
         // Cleanup on unmount
