@@ -63,6 +63,8 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
         return 180 - angle;
     };
 
+    console.log("ArmControl", part.minAngle);
+
     return (
         <div className={st.container}>
             <div className={st.currentAngle}>{currentAngle}&deg;</div>
@@ -121,6 +123,34 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                         setAngle || 90
                     )} 100 100)`}
                 />
+                {part.minAngle && (
+                    <line
+                        x1="0"
+                        y1="100"
+                        x2="100"
+                        y2="100"
+                        fill="none"
+                        stroke="#770000"
+                        strokeWidth="4"
+                        transform={`rotate(${translateAngle(
+                            part.minAngle
+                        )} 100 100)`}
+                    />
+                )}
+                {part.maxAngle && (
+                    <line
+                        x1="25"
+                        y1="100"
+                        x2="100"
+                        y2="100"
+                        fill="none"
+                        stroke="#770000"
+                        strokeWidth="4"
+                        transform={`rotate(${translateAngle(
+                            part.maxAngle
+                        )} 100 100)`}
+                    />
+                )}
             </svg>
         </div>
     );

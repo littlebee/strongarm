@@ -37,13 +37,12 @@ def serializeState():
 
 
 def update_state_from_message_data(message_data):
-    movable_parts = [
-        part for part in state.get("arm_parts", []) if part.get("fixed") is False
-    ]
-
     for key in message_data:
         data = message_data[key]
         if key == "set_angles":
+            arm_parts = state.get("arm_config", {}).get("arm_parts", [])
+            movable_parts = [part for part in arm_parts if not part.get("fixed")]
+            log.info(f"got set_angles {movable_parts}")
             # clamp angles to min/max
             for i in range(len(movable_parts)):
                 partMin = movable_parts[i].get("minAngle") or 0
