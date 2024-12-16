@@ -42,10 +42,65 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
         directionalLight.position.set(0, 20, 20);
         scene.add(directionalLight);
 
-        const loader = new STLLoader();
-        const material = new THREE.MeshStandardMaterial({ color: 0xff5533 });
+        await loadStlFiles();
 
-        // Load STL files
+        let parent = scene;
+        for (const part of parts) {
+            parent.add(part.threeDObject);
+            part.threeDObject.position.set(
+                part.part.position.x - (part.part.rotationOffset?.x || 0),
+                part.part.position.y - (part.part.rotationOffset?.y || 0),
+                part.part.position.z - (part.part.rotationOffset?.z || 0)
+            );
+            parent = part.threeDObject;
+        }
+
+        // Camera position
+        camera.position.x = -700;
+        camera.position.y = 300;
+        camera.position.z = 200;
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(-200, 260, 300);
+        controls.update();
+
+        // Cleanup on unmount
+        return () => {
+            mount.removeChild(renderer.domElement);
+        };
+    }, [parts]);
+
+    useEffect(() => {
+        if (!parts || !currentAngles) return;
+
+        const movables = parts.filter((part) => !part.part.fixed);
+        // console.log({ movables });
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+
+            movables.forEach((part, index) => {
+                if (part && part.threeDObject) {
+                    const axis = part.part.rotationAxis || "x";
+                    part.threeDObject.rotation[axis] = degToRad(
+                        90 -
+                            currentAngles[index] +
+                            (part.part.initialRotation?.[axis] || 0)
+                    );
+                }
+            });
+            renderer.render(scene, camera);
+        };
+
+        animate();
+    }, [parts, currentAngles]);
+
+    async function loadStlFiles() {
+        const loader = new STLLoader();
+        const material = new THREE.MeshStandardMaterial({
+            color: 0xff5533,
+        });
+
         const promises = [];
         parts.forEach((part, i) => {
             const promise = new Promise((resolve) => {
@@ -82,59 +137,7 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
             promises.push(promise);
         });
         await Promise.all(promises);
-
-        let parent = scene;
-        for (const part of parts) {
-            parent.add(part.threeDObject);
-            part.threeDObject.position.set(
-                part.part.position.x - (part.part.rotationOffset?.x || 0),
-                part.part.position.y - (part.part.rotationOffset?.y || 0),
-                part.part.position.z - (part.part.rotationOffset?.z || 0)
-            );
-            parent = part.threeDObject;
-        }
-
-        // Camera position
-        camera.position.x = -700;
-        camera.position.y = 300;
-        camera.position.z = 200;
-
-        // camera.lookAt(-300, 260, 0);
-
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.target.set(-200, 260, 300);
-        controls.update();
-
-        // Cleanup on unmount
-        return () => {
-            mount.removeChild(renderer.domElement);
-        };
-    }, [parts]);
-
-    useEffect(() => {
-        if (!parts || !currentAngles) return;
-
-        const movables = parts.filter((part) => !part.part.fixed);
-        // console.log({ movables });
-
-        const animate = () => {
-            requestAnimationFrame(animate);
-
-            movables.forEach((part, index) => {
-                if (part && part.threeDObject) {
-                    const axis = part.part.rotationAxis || "x";
-                    part.threeDObject.rotation[axis] = degToRad(
-                        90 -
-                            currentAngles[index] +
-                            (part.part.initialRotation?.[axis] || 0)
-                    );
-                }
-            });
-            renderer.render(scene, camera);
-        };
-
-        animate();
-    }, [parts, currentAngles]);
+    }
 
     return <div ref={mountRef} style={{ width: "100%", height: "100%" }} />;
 };
