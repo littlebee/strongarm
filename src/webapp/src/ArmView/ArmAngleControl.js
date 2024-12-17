@@ -10,25 +10,36 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
 
     useEffect(() => {
         const handleMouseMove = (e) => {
-            if (grabberSelected) {
-                const rect = svgRef.current.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const angle = Math.atan2(y - 100, x - 100) * (180 / Math.PI);
-                onSetAngle(angle * -1);
+            if (
+                !svgRef.current ||
+                !grabberSelected ||
+                !(e.clientX || e.touches)
+            ) {
+                return;
             }
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            const rect = svgRef.current.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            const angle = Math.atan2(y - 100, x - 100) * (180 / Math.PI);
+            onSetAngle(angle * -1);
         };
 
         const handleMouseUp = () => {
-            setGrabberSelected(false);
+            grabberSelected && setGrabberSelected(false);
         };
 
         document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("mouseup", handleMouseUp);
+        document.addEventListener("touchmove", handleMouseMove);
+        document.addEventListener("touchend", handleMouseUp);
 
         return () => {
             document.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("mouseup", handleMouseUp);
+            document.removeEventListener("touchmove", handleMouseMove);
+            document.removeEventListener("touchend", handleMouseUp);
         };
     }, [grabberSelected, onSetAngle]);
 
@@ -62,8 +73,6 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
     const translateAngle = (angle) => {
         return 180 - angle;
     };
-
-    console.log("ArmControl", part.minAngle);
 
     return (
         <div className={st.container}>
@@ -103,11 +112,10 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                     width="50"
                     rx="10"
                     fill="#9d6" // from lcars.css
-                    transform={`rotate(${translateAngle(
-                        currentAngle
-                    )} 100 100)`}
-                    opacity={grabberSelected ? 1 : grabberHovered ? 0.8 : 0.5}
+                    transform={`rotate(${translateAngle(setAngle)} 100 100)`}
+                    opacity={grabberSelected ? 1 : grabberHovered ? 0.8 : 0.7}
                     onMouseDown={handleGrabberMouseDown}
+                    onTouchStart={handleGrabberMouseDown}
                     onMouseEnter={() => setGrabberHovered(true)}
                     onMouseLeave={() => setGrabberHovered(false)}
                 />
@@ -120,7 +128,7 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                     stroke="#ffff00"
                     strokeWidth="1"
                     transform={`rotate(${translateAngle(
-                        setAngle || 90
+                        currentAngle || 90
                     )} 100 100)`}
                 />
                 {part.minAngle && (
