@@ -38,10 +38,10 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
         // Lighting
         const ambientLight = new THREE.AmbientLight(0x666666);
         scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
         directionalLight.position.set(0, 20, 20);
         scene.add(directionalLight);
-        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
+        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2);
         directionalLight2.position.set(0, -20, -20);
         scene.add(directionalLight2);
 

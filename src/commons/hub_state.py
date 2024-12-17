@@ -27,6 +27,13 @@ state = {
         # the arm ports associated with selected arm configuration
         "arm_parts": [],
     },
+    # saved positions provided initially by saved_positions_provider
+    # and updated by the UI. Structure of the objects in the array
+    # is consumed and controlled by the UI. saved_positions_provider
+    # only saves and sends the array of objects.
+    #
+    # See hubState.js for details on the structure of the objects.
+    "saved_positions": [],
 }
 
 log.info(f"initial state: {state}")

@@ -48,6 +48,15 @@ export const DEFAULT_HUB_STATE = {
         arm_parts: [],
     },
 
+    // saved positions provided initially by saved_positions_provider
+    // and updated by the UI.   This should be an array of objects like:
+    // {
+    //   "name": "some name",
+    //   "description": "some description",
+    //   "angles": [0, 90, 90, 90, 90, 90]
+    // }
+    saved_positions: [],
+
     subsystem_stats: {},
 };
 
@@ -94,9 +103,21 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
         });
 
         webSocket.addEventListener("message", function (event) {
-            log("got message from central-hub", event.data);
             lastHubUpdate = Date.now();
-            const message = JSON.parse(event.data);
+            let message = null;
+            try {
+                message = JSON.parse(event.data);
+            } catch (e) {
+                console.error("error parsing message from central-hub", e);
+                return;
+            }
+            if (message.type === "pong") {
+                return;
+            }
+            log("got message from central-hub", {
+                raw: event.data,
+                parsed: message,
+            });
             if (message.type === "state" && hubStatePromises.length > 0) {
                 hubStatePromises.forEach((p) => p(message.data));
                 hubStatePromises = [];
@@ -189,9 +210,8 @@ function setHubConnStatus(newStatus) {
 
 function updateStateFromCentralHub(hubData) {
     for (const [key, value] of Object.entries(hubData)) {
-        log("got hub state update", key, value);
-        // TODO : unless we merge the state with incoming
-        // state for any top level key must be whole
+        // TODO : maybe merge the state with incoming.
+        // State for any top level key must be whole
         __hub_state[key] = value;
     }
     emitUpdated();

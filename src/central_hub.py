@@ -20,12 +20,12 @@ identities = dict()
 
 
 def iseeu_message(websocket):
-    remoteIp = websocket.remote_address[0]
     return json.dumps(
         {
             "type": "iseeu",
             "data": {
-                "ip": remoteIp,
+                "ip": websocket.remote_address[0],
+                "port": websocket.remote_address[1],
             },
         }
     )
