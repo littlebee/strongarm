@@ -3,6 +3,8 @@ import json
 
 from commons import log
 
+PERSISTED_STATE_FILE = "./persisted_state.json"
+
 state = {
     # provided by central_hub/
     "hub_stats": {"state_updates_recv": 0},
@@ -27,16 +29,39 @@ state = {
         # the arm ports associated with selected arm configuration
         "arm_parts": [],
     },
-    # saved positions provided initially by saved_positions_provider
-    # and updated by the UI. Structure of the objects in the array
-    # is consumed and controlled by the UI. saved_positions_provider
-    # only saves and sends the array of objects.
+    # Structure of the objects in the array is consumed and controlled
+    # by the UI.
     #
     # See hubState.js for details on the structure of the objects.
     "saved_positions": [],
 }
 
+persisted_state_keys = [
+    "arm_config_selected",
+    "saved_positions",
+]
+
+# if persisted state file exists, load it
+try:
+    with open(PERSISTED_STATE_FILE, "r") as f:
+        persisted_state = json.load(f)
+        for key in persisted_state_keys:
+            if key in persisted_state:
+                state[key] = persisted_state[key]
+except FileNotFoundError:
+    log.info("No persisted state file found")
+except Exception as e:
+    log.error(f"Error loading persisted state: {e}")
+
 log.info(f"initial state: {state}")
+
+
+def persist_state():
+    persisted_state = {}
+    for key in persisted_state_keys:
+        persisted_state[key] = state[key]
+    with open(PERSISTED_STATE_FILE, "w") as f:
+        json.dump(persisted_state, f, indent=4)
 
 
 def serializeState():

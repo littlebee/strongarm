@@ -203,13 +203,10 @@ async def handleMessage(websocket, path):
         await websocket.close()
 
 
-# async def send_hub_stats_task():
-#     while True:
-#         await send_state_update_to_subscribers(
-#             {"hub_stats": hub_state.state["hub_stats"]}
-#         )
-
-#         await asyncio.sleep(20)
+async def persist_state_task():
+    while True:
+        hub_state.persist_state()
+        await asyncio.sleep(1)
 
 
 async def main():
@@ -217,6 +214,7 @@ async def main():
     async with websockets.serve(handleMessage, port=constants.HUB_PORT):
         # log.info("Starting hub stats task")
         # await send_hub_stats_task()
+        await persist_state_task()
         await asyncio.Future()  # run forever
 
 

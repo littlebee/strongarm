@@ -8,6 +8,9 @@ node_modules/
 yarn.lock
 package-lock.json
 
+# see hub_state.py
+persisted_state.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
