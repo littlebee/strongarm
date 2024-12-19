@@ -32,6 +32,8 @@
     position: absolute;
     left: 100%;
     width: 100%;
+    height: calc(100% - 100px);
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;

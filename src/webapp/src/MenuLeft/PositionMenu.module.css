@@ -1,0 +1,58 @@
+.container {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-bottom: 20px;
+    border-bottom: 2px solid;
+    margin-bottom: 20px;
+    cursor: default;
+}
+
+
+.close {
+    display: flex;
+    width: 20px;
+    height: 20px;
+    padding: 15px;
+    border: 1px solid;
+    cursor: pointer;
+    margin-right: 10px;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    border-radius: 7px;
+}
+
+.title {
+    display: flex;
+    flex-direction: row;
+    background-color: #2d42a87c;
+    padding: 10px;
+    align-items: center;
+    margin-right: 7px;
+}
+
+.name {
+    flex-grow: 1;
+    overflow-wrap: anywhere;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 20px;
+}
+
+.description {
+    text-align: left;
+    font-style: italic;
+    padding: 10px;
+    margin-right: 7px;
+    max-height: 100px;
+    overflow-y: scroll;
+    background-color: #2d42a87c;
+}

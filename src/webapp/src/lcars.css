@@ -740,7 +740,8 @@ a {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   margin: 30px 0;
   font-weight: normal;
   text-transform: uppercase;
@@ -758,7 +759,11 @@ h2 {
 }
 
 h3 {
-  font-size: clamp(1.1rem, 1rem + 2vw, 1.8rem)
+  font-size: clamp(1.1rem, 1rem + 2vw, 1.8rem);
+}
+h4 {
+  font-size: clamp(0.8rem, 0.9rem + 1vw, 1rem);
+  margin: 10px 0px;
 }
 
 p.caption {

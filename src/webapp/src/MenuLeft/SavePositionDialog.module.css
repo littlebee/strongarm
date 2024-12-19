@@ -7,17 +7,68 @@
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 100;
 }
-.closed {
-    display: none;
-}
 .dialog {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
+    background-color: #5588ee;
     z-index: 101;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+.closed {
+    display: none;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+}
+.dialogTitle {
+    display: flex;
+    padding: 7px;
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    margin: 15px 15px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+}
+
+.inputRow{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    label {
+        min-width: 100px;
+    }
+    input, textarea {
+        flex-grow: 1;
+    }
+}
+
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 10px;
+    gap: 20px;
+
+    button {
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        border-radius: 10px;
+    }
 }
