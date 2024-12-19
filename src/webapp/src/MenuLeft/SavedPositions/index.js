@@ -1,12 +1,12 @@
 // Menu left react component to add and show the saved positions in hubstate
 import React, { useState, useCallback } from "react";
 
-import { classnames as cx } from "../util/classNames";
-import st from "./Position.module.css";
+import { classnames as cx } from "../../util/classNames";
+import st from "./index.module.css";
 import { SavePositionDialog } from "./SavePositionDialog";
 import { PositionMenu } from "./PositionMenu";
 
-export function Position({ hubState }) {
+export function SavedPositions({ hubState }) {
     const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
     const [selectedPosition, setSelectedPosition] = useState(null);
 
@@ -47,7 +47,8 @@ export function Position({ hubState }) {
             </div>
             {selectedPosition && (
                 <PositionMenu
-                    position={selectedPosition}
+                    hubState={hubState}
+                    positionId={selectedPosition.uuid}
                     onClose={handleUnselectPosition}
                 />
             )}

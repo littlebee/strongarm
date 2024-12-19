@@ -198,6 +198,11 @@ async def handleMessage(websocket, path):
                 await handlePing(websocket)
             else:
                 logging.error("received unsupported message: %s", messageType)
+
+    except Exception as e:
+        log.error(f"handleMessage: {e}")
+        raise
+
     finally:
         await unregister(websocket)
         await websocket.close()

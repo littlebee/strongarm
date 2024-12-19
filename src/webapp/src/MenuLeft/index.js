@@ -5,7 +5,7 @@ import st from "./index.module.css";
 import { BackButton } from "../components/icons/BackButton";
 
 import { ArmConfig } from "./ArmConfig";
-import { Position } from "./Position";
+import { SavedPositions } from "./SavedPositions";
 
 const BASE_NODE_NAME = "Menu Root";
 
@@ -26,7 +26,10 @@ const MenuLeft = ({ hubState }) => {
     */
     const items = [
         { name: "Arm Config", component: <ArmConfig hubState={hubState} /> },
-        { name: "Position", component: <Position hubState={hubState} /> },
+        {
+            name: "Saved Positions",
+            component: <SavedPositions hubState={hubState} />,
+        },
         { name: "Sequence", component: <div>Sequence component here</div> },
     ];
 

@@ -20,15 +20,16 @@
 }
 
 .positionItem {
+    border-bottom: #11e 1px solid;
+    cursor: pointer;
     font-weight: 400;
     font-size: 18px;
-    width: 100%;
     text-overflow: ellipsis;
     text-align: left;
-    padding: 10px;
+    padding: 20px;
     position: relative;
-    cursor: pointer;
     transition: top 3s;
+    width: 100%;
 
     /* override lcars */
     text-transform: none !important;
@@ -36,6 +37,7 @@
 
 .positionItem:hover {
     background-color: rgba(42, 90, 186, 0.5);
+    border-bottom: #11e 2px solid;
 }
 
 .selectedItem {

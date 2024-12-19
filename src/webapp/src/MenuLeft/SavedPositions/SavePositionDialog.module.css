@@ -1,0 +1,20 @@
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+}
+
+.inputRow{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    label {
+        min-width: 100px;
+    }
+    input, textarea {
+        flex-grow: 1;
+    }
+}
+
