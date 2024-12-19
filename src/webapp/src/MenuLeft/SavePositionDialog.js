@@ -1,6 +1,7 @@
 // Dialog to save the current_angles to the saved_positions hubstate
 //
 import React, { useCallback, useState, useRef, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import { classnames as cx } from "../util/classNames";
 import { sendHubStateUpdate } from "../util/hubMessages";
@@ -32,6 +33,7 @@ export function SavePositionDialog({ hubState, isOpen, onClose }) {
         const saved_positions = [
             ...hubState.saved_positions,
             {
+                uuid: uuidv4(),
                 name,
                 description,
                 angles: hubState.current_angles,
