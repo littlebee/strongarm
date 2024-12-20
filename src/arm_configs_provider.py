@@ -88,7 +88,7 @@ async def consumer_task():
         try:
             log.info(f"connecting to {c.HUB_URI}")
             async with websockets.connect(c.HUB_URI) as websocket:
-                await messages.send_identity(websocket, "arms_config_provider")
+                await messages.send_identity(websocket, "arm_configs_provider")
                 await messages.send_subscribe(websocket, ["arm_config_selected"])
                 await initialize_arm_configs()
 

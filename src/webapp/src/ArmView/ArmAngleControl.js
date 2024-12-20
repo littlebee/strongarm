@@ -139,7 +139,8 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                         y2="100"
                         fill="none"
                         stroke="#770000"
-                        strokeWidth="4"
+                        strokeWidth="2"
+                        strokeDasharray="5"
                         transform={`rotate(${translateAngle(
                             part.minAngle
                         )} 100 100)`}

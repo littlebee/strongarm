@@ -6,6 +6,15 @@ import asyncio
 import traceback
 import websockets
 
+"""
+    This python process is responsible for controlling the servos on the arm.
+
+    It subscribes to the central_hub for `set_angles` messages
+    and publishes `current_angles`
+
+"""
+
+
 from commons import constants as c, messages, log, servo
 
 servos = []

@@ -16,11 +16,10 @@
 .controls {
     position: absolute;
     right: 0px;
-    top: -50px;
     width: 300px;
-    height: calc(100% + 50px);
+    height: 100%;
     overflow: auto;
     padding: 20px;
     border-radius: 10px;
-    background-color: #0d0d0d88;
+    background-color: #2323238a;
 }

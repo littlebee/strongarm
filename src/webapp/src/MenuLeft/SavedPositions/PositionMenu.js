@@ -6,6 +6,7 @@ import { sendHubStateUpdate, sendSetAngles } from "../../util/hubMessages";
 import st from "./PositionMenu.module.css";
 import { SavePositionDialog } from "./SavePositionDialog";
 import { ConfirmationDialog } from "../../components/ConfirmationDialog";
+import { anglesCloseEnough } from "../../util/hubstate_utils";
 
 export function PositionMenu({ hubState, positionId, onClose }) {
     const position = useMemo(
@@ -16,6 +17,8 @@ export function PositionMenu({ hubState, positionId, onClose }) {
     const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
     const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
         useState(false);
+
+    const closeEnough = anglesCloseEnough(hubState.set_angles, position.angles);
 
     const handleMoveToPosition = useCallback(() => {
         sendSetAngles(position.angles);

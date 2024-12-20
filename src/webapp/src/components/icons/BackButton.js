@@ -3,15 +3,10 @@ import React from "react";
 import st from "./BackButton.module.css";
 
 export const BackButton = ({ onClick }) => {
-    const handleBackClick = () => {
-        console.log("back button clicked");
-        onClick();
-    };
-
     return (
         <button
             className={st.backButton}
-            onClick={handleBackClick}
+            onClick={onClick}
             title="Back to root menu"
         >
             <svg

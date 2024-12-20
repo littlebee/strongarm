@@ -20,9 +20,9 @@ export function Dialog({ title, isOpen, onClose, buttons, children }) {
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
             if (e.key === "Escape") {
+                e.preventDefault();
+                e.stopPropagation();
                 onClose();
             }
         };

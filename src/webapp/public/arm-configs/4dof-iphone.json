@@ -93,9 +93,9 @@
             "name": "pan-tilt-rotator",
             "file": "pan-tilt-rotator.stl",
             "position": {
-                "x": 0,
+                "x": 1,
                 "y": 0,
-                "z": 50
+                "z": 39
             },
             "initialRotation": {
                 "x": 0,
