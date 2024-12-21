@@ -76,7 +76,7 @@ async def load_and_send_arm_config(websocket, arm_config_json_file):
 
 async def send_selected_arm_config(websocket):
     global current_arm_config
-    log.info(f"sending selected arm_config: {current_arm_config["filename"]}")
+    log.info(f"sending selected arm_config: {current_arm_config['filename']}")
     await messages.send_state_update(
         websocket, {"arm_config_selected": current_arm_config["filename"]}
     )

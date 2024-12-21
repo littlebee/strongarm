@@ -24,6 +24,7 @@
                 "y": -27,
                 "z": 50
             },
+            "invertRotation": true,
             "rotationAxis": "z"
         },
         {
@@ -119,8 +120,9 @@
             "initialRotation": {
                 "x": 0,
                 "y": 0,
-                "z": -90
+                "z": 90
             },
+            "invertRotation": true,
             "rotationAxis": "z",
             "rotationOffset": {
                 "x": 0,

@@ -17,8 +17,9 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-# start web service
-/home/bee/strongarm/start.sh > /home/bee/strongarm/rclocal.log
+# start web services
+cd /home/bee/strongarm
+./start.sh > /home/bee/strongarm/logs/rclocal.log
 
 
 exit 0

@@ -3,37 +3,47 @@
     top: 0;
     display: flex;
     flex-direction: column;
+    border-radius: 10px;
 }
 
 .header {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding-bottom: 20px;
-    border-bottom: 2px solid;
+    padding: 30px 0px 20px;
+    background-color: #2d42a87c;
+    border-radius: 10px;
     margin-bottom: 20px;
     cursor: default;
+    text-align: left;
+    font-weight: 400;
 }
 
 
 .close {
+    position: absolute;
+    left: 1px;
+    top: 1px;
     display: flex;
     width: 20px;
     height: 20px;
-    padding: 15px;
-    border: 1px solid;
+    padding: 14px;
     cursor: pointer;
+    border: 1px solid;
+    border-radius: 7px;
     margin-right: 10px;
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    border-radius: 7px;
+}
+
+.close:hover {
+    background-color: #2d42a8;
 }
 
 .title {
     display: flex;
     flex-direction: row;
-    background-color: #2d42a87c;
     padding: 10px;
     align-items: center;
     margin-right: 7px;
@@ -50,10 +60,10 @@
 .description {
     text-align: left;
     font-style: italic;
+    font-size: 15px;
     padding: 10px;
     margin-right: 7px;
     max-height: 100px;
     overflow-y: scroll;
-    background-color: #2d42a87c;
 }
 

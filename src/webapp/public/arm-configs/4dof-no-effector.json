@@ -24,7 +24,9 @@
                 "y": -27,
                 "z": 50
             },
+            "invertRotation": true,
             "rotationAxis": "z"
+
         },
         {
             "name": "arm-segment-1",

@@ -33,7 +33,7 @@ export function SavePositionDialog({
         }
     }, [existingPosition]);
 
-    const handleSave = useCallback((e) => {
+    function savePosition(withAngles = false) {
         if (name === "") {
             alert("Please enter a name for the position");
             return;
@@ -47,7 +47,9 @@ export function SavePositionDialog({
                 ...existingPosition,
                 name,
                 description,
-                angles: hubState.current_angles,
+                angles: withAngles
+                    ? hubState.current_angles
+                    : existingPosition.angles,
             };
         } else {
             saved_positions.push({
@@ -58,12 +60,18 @@ export function SavePositionDialog({
             });
         }
         sendHubStateUpdate({ saved_positions });
+    }
+    const handleSave = useCallback((withAngles) => {
+        savePosition(withAngles);
         onClose();
     });
 
     const buttons = useMemo(() => (
         <>
-            <button onClick={handleSave}>Save</button>
+            <button onClick={() => handleSave(false)}>Save</button>
+            <button onClick={() => handleSave(true)}>
+                Save w/ current angles
+            </button>
             <button onClick={onClose}>Cancel</button>
         </>
     ));

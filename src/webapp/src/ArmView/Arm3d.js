@@ -85,11 +85,15 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
             movables.forEach((part, index) => {
                 if (part && part.threeDObject) {
                     const axis = part.part.rotationAxis || "x";
-                    part.threeDObject.rotation[axis] = degToRad(
-                        90 -
-                            currentAngles[index] +
-                            (part.part.initialRotation?.[axis] || 0)
-                    );
+                    const initial = part.part.initialRotation?.[axis] || 0;
+
+                    if (index < currentAngles.length) {
+                        let newAngle = 90 - currentAngles[index] + initial;
+                        if (part.part.invertRotation) {
+                            newAngle *= -1;
+                        }
+                        part.threeDObject.rotation[axis] = degToRad(newAngle);
+                    }
                 }
             });
             renderer.render(scene, camera);
