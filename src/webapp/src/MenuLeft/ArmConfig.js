@@ -19,7 +19,7 @@ export function ArmConfig({ hubState }) {
                             onClick={() => handleArmConfigClick(file)}
                             className={
                                 (file === hubState.arm_config.filename &&
-                                    st.selected) ||
+                                    "selected") ||
                                 null
                             }
                         >

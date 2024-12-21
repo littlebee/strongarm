@@ -1,10 +1,11 @@
 // Menu left react component to add and show the saved positions in hubstate
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 
 import { classnames as cx } from "../../util/classNames";
 import st from "./index.module.css";
 import { SavePositionDialog } from "./SavePositionDialog";
 import { PositionMenu } from "./PositionMenu";
+import { anglesCloseEnough } from "../../util/angle_utils";
 
 export function SavedPositions({ hubState }) {
     const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -38,8 +39,8 @@ export function SavedPositions({ hubState }) {
                     {hubState.saved_positions.map((position, index) => (
                         <PositionItem
                             key={index}
+                            hubState={hubState}
                             position={position}
-                            isSelected={selectedPosition === position}
                             onClick={handlePositionClick}
                         />
                     ))}
@@ -62,13 +63,18 @@ export function SavedPositions({ hubState }) {
     );
 }
 
-function PositionItem({ position, isSelected, onClick }) {
+function PositionItem({ hubState, position, onClick }) {
+    const closeEnough = useMemo(
+        () => anglesCloseEnough(hubState.set_angles, position.angles),
+        [hubState.set_angles, position.angles]
+    );
+
     return (
-        <div
-            className={cx(st.positionItem, isSelected && st.selectedItem)}
+        <a
+            className={cx("secondary", closeEnough && "selected")}
             onClick={() => onClick(position)}
         >
             {position.name}
-        </div>
+        </a>
     );
 }

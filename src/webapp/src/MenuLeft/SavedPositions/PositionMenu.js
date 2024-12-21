@@ -6,7 +6,7 @@ import { sendHubStateUpdate, sendSetAngles } from "../../util/hubMessages";
 import st from "./PositionMenu.module.css";
 import { SavePositionDialog } from "./SavePositionDialog";
 import { ConfirmationDialog } from "../../components/ConfirmationDialog";
-import { anglesCloseEnough } from "../../util/hubstate_utils";
+import { anglesCloseEnough } from "../../util/angle_utils";
 
 export function PositionMenu({ hubState, positionId, onClose }) {
     const position = useMemo(
@@ -18,7 +18,10 @@ export function PositionMenu({ hubState, positionId, onClose }) {
     const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
         useState(false);
 
-    const closeEnough = anglesCloseEnough(hubState.set_angles, position.angles);
+    const closeEnough = useMemo(
+        () => anglesCloseEnough(hubState.set_angles, position.angles),
+        [hubState.set_angles, position.angles]
+    );
 
     const handleMoveToPosition = useCallback(() => {
         sendSetAngles(position.angles);
@@ -63,7 +66,12 @@ export function PositionMenu({ hubState, positionId, onClose }) {
                         {position.description}
                     </div>
                 </div>
-                <a onClick={handleMoveToPosition}>Move to position</a>
+                <a
+                    className={closeEnough && "selected disabled"}
+                    onClick={handleMoveToPosition}
+                >
+                    Move to position
+                </a>
                 <a onClick={handleEditPosition}>Edit</a>
                 <a onClick={handleDeleteClick}>Delete</a>
             </div>

@@ -12,8 +12,6 @@ import {
 import { Header } from "./Header";
 import { HubStateDialog } from "./HubStateDialog";
 
-import "./lcars.css";
-import "./App.css";
 import { ArmView } from "./ArmView";
 import MenuLeft from "./MenuLeft";
 

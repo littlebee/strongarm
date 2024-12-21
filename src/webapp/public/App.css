@@ -30,6 +30,31 @@ label {
     border-bottom: 1px solid #000;
 }
 
+.sidebar-buttons a.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.sidebar-buttons a.selected {
+    background-color: #2d42a87c;
+}
+
+.sidebar-buttons a.secondary {
+    border-bottom: #11e 1px solid;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 18px;
+    text-overflow: ellipsis;
+    text-align: left;
+    padding: 20px;
+    position: relative;
+    transition: top 3s;
+    width: 100%;
+
+    /* override lcars */
+    text-transform: none !important;
+}
+
 /* convenience  */
 .flex-row {
     display: flex;
