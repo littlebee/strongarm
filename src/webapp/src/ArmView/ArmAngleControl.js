@@ -76,7 +76,9 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
 
     return (
         <div className={st.container}>
-            <div className={st.currentAngle}>{currentAngle}&deg;</div>
+            <div className={st.currentAngle}>
+                {parseFloat(currentAngle).toFixed(3)}&deg;
+            </div>
             <div className={st.textLabels}>
                 <label>{part.name}</label>
                 <div>

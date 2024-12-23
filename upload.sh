@@ -15,6 +15,7 @@ TARGET_HOST=$1
 
 rsync --progress --partial \
 --exclude=node_modules \
+--exclude=persisted_state.json \
 --exclude=data/ \
 --exclude=logs/ \
 --exclude=*.pid \

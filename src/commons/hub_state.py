@@ -41,19 +41,21 @@ persisted_state_keys = [
     "saved_positions",
 ]
 
-# if persisted state file exists, load it
-try:
-    with open(PERSISTED_STATE_FILE, "r") as f:
-        persisted_state = json.load(f)
-        for key in persisted_state_keys:
-            if key in persisted_state:
-                state[key] = persisted_state[key]
-except FileNotFoundError:
-    log.info("No persisted state file found")
-except Exception as e:
-    log.error(f"Error loading persisted state: {e}")
 
-log.info(f"initial state: {state}")
+def init_persisted_state():
+    # if persisted state file exists, load it
+    try:
+        with open(PERSISTED_STATE_FILE, "r") as f:
+            persisted_state = json.load(f)
+            for key in persisted_state_keys:
+                if key in persisted_state:
+                    state[key] = persisted_state[key]
+    except FileNotFoundError:
+        log.info("No persisted state file found")
+    except Exception as e:
+        log.error(f"Error loading persisted state: {e}")
+
+    log.info(f"initial state: {state}")
 
 
 def persist_state():

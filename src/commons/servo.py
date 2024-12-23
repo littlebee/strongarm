@@ -21,8 +21,7 @@ except:
 
 # env var to turn on console debug output
 DEBUG_MOTORS = os.getenv("DEBUG_MOTORS") or False
-# it takes about 3 seconds for the servo to move 180deg
-SECONDS_PER_DEGREE = 3 / 180
+
 # how many deg to turn per step (abs)
 STEP_DEGREES = 1
 # how long to wait between steps (default; use step_delay setter to change at run time)
@@ -153,7 +152,13 @@ class Servo:
                     f"stepping motor {self.motor_channel}, {direction}, {self.current_angle}, {self.destination_angle}, {would_overshoot}"
                 )
 
-            if self.current_angle == self.destination_angle or would_overshoot:
+            if self.current_angle == self.destination_angle:
+                return False
+
+            if would_overshoot:
+                # get the servo as close to the destination as possible
+                servo_kit.servo[self.motor_channel].angle = self.destination_angle
+                # and then stop the movement loop
                 return False
 
             new_angle = self.current_angle + (STEP_DEGREES * direction)

@@ -11,12 +11,14 @@
     min-width: 100px;
     flex-direction: column;
     justify-content: space-between;
+    font-size: 18px;
 }
 
 .currentAngle {
     position: absolute;
-    top: 80px;
-    left: 200px;
+    top: 90px;
+    left: 150px;
+    font-size: 18px;
 }
 
 .angleInputContainer {
@@ -34,5 +36,5 @@
     width: 70px;
     height: 35px;
     font-size: large;
-    background-color: #9cf;
+    background-color: rgb(216, 234, 255);
 }

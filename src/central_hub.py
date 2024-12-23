@@ -215,6 +215,8 @@ async def persist_state_task():
 
 
 async def main():
+    log.info("Loading persisted state")
+    hub_state.init_persisted_state()
     log.info(f"Starting server on port {constants.HUB_PORT}")
     async with websockets.serve(handleMessage, port=constants.HUB_PORT):
         # log.info("Starting hub stats task")
