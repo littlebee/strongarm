@@ -98,15 +98,10 @@
                 "y": 0,
                 "z": 39
             },
-            "initialRotation": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-            },
             "rotationOffset": {
                 "x": 0,
                 "y": 0,
-                "z": 50
+                "z": 35
             }
         },
         {
@@ -115,7 +110,7 @@
             "position": {
                 "x": 0,
                 "y": -20,
-                "z": 130
+                "z": 120
             },
             "initialRotation": {
                 "x": 0,
