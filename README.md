@@ -1,6 +1,109 @@
+
+## This is a work in progress. Will provide updates here and remove this banner when ready for others to use.
+
+Earth date: Dec 26, 2024
+
+The basic code will work to control the arm angles and select arm configs.  Working on Ros2 integration.
+
 # strongarm
 
 The software and docs for my robotic arm.
+
+<img src="https://github.com/littlebee/strongarm/blob/014361c710a28d72579e17891dc30442e848df3a/docs/strongarm_webui.png"
+     alt="web UI"
+     style="float: right; margin-right: 10px; width: 400px;" />
+
+
+
+## Physical build parts needed.
+
+1.  3d print the files in `src/webapp/public/arm-parts`
+2.  Go shopping:
+|quantity|part needed|cost|link|
+|1|20Kgcm 270&deg; servo for iphone rotator|14.99| (amazon)[https://www.amazon.com/gp/product/B0B67YGV66/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&th=1]|
+|1|35Kgcm 270&deg; servo for end effector|28.96| (amazon)[https://www.amazon.com/gp/product/B07S9XZYN2/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1]|
+|2|60Kgcm 270&deg; dual shaft servo for top arm segments|30.00| (amazon)[https://www.amazon.com/gp/product/B0C1BXJWMK/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1]
+|1|150Kgcm 270&deg; dual shaft servo for bottom arm joint|44.00| (amazon)[https://www.amazon.com/gp/product/B0CP126F77/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1]
+|1|60Kgcm 270&deg; single shaft servo for base turntable|34.89| (amazon)[https://www.amazon.com/gp/product/B08HYX5SX3/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1]
+|36| M2 16m cap head bolts (for 3 arm join servos) |6.28| (amazon)[https://www.amazon.com/iexcell-Thread-Socket-Screws-Finish/dp/B0D4JKNJXC/ref=sr_1_3]
+|36| M2 washers | 7.99 | (amazon)[https://www.amazon.com/HELIFOUNER-Pieces-Washers-Diameter-Thickness/dp/B0B5GYG82X/ref=sr_1_3]
+|24| M3 12mm self tapping screws |5.49|(amazon)[https://www.amazon.com/uxcell-Socket-Tapping-Screws-Carbon/dp/B0D9BDK6ZL/ref=sr_1_3]
+|4| M5 20mm button head screws for mounting turn table servo | 8.99 | (amazon)(https://www.amazon.com/gp/product/B0BLNMLHYG/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1)
+|4| M5 nuts | 6.99 | (amazon)[https://www.amazon.com/Stainless-Self-Locking-Industrial-Construction-Fasteners/dp/B09PF4T3HD/ref=sr_1_3_pp]
+
+## Onboard computer and micro controller
+
+I have tried be as platform agnostic as I can and the scripts and python code should work with any single board computer and servo controller supported by [Adafruit's servo-kit](https://docs.circuitpython.org/projects/servokit/en/stable/)
+
+I know it works on a Raspberry Pi 4b (4GB), Raspian Bullseye 64, with the [Adeept Motor Hat](https://www.adeept.com/adeept-motor-hat-for-raspberry-pi-smart-robot-car-driver_p0133.html) because I had extra laying around.   The nice thing about the Adeept hat is that it has the power converter that can take any 12 - 60VDC power supplie and also supply clean stable power to the Raspberry Pi.
+
+The fixed base model may not fit larger sized SBCs, you will need to rectify that in Tinkercad on your own or house your sbc elsewhere.
+
+
+## Getting started
+
+1. buy / or build 👆 the arm.
+
+For build help, here is the link to a web mockup shared from my fusion 360 disigns that shows the build with servos in place:  https://a360.co/3Phep9W
+
+Connect the servos to the servo controller such that the base turntable servo is channel 0, and then up from there in sequential order.
+
+### Clone this repo
+```bash
+git clone https://github.com/littlebee/strongarm.git
+```
+
+### SSH or bust
+
+You will need to be able to SSH into the onboard computer to upload code to the SBC.  Ensure that you can successfully log-in,
+```bash
+ssh myrobotarm.local
+```
+replace "myrobotarm.local" with the hostname of your onboard computer or its IP address.
+
+Setting up SSH on the SBC will be dependent on the SBC used and variatation of Linux.  For Raspian on Raspberry Pi, here is a [good article.](https://roboticsbackend.com/enable-ssh-on-raspberry-pi-raspbian/)  The raspian image flasher will now alow you to setup SSH from the initial boot full security.
+
+I work on a macbook and use iTerm2 for terminal.  One of the additions I like to make to the standard setup, is to use the same user name on the Pi that I use locally on my mac.  This allows not having to type `ssh raspberry@mybot.local`, because the name is the same just `ssh mybot.local` works.
+
+I also like to add my public key to the `~/.ssh/authorized_keys` file on the remote SBC. This will stop it from prompting you for the password on every SSH command (upload.sh uses rsync which uses ssh).   I made a [gist of the script](https://gist.github.com/littlebee/b285f0b9d219e56fe29b7248440309a5) I use to upload my public key to new boards.
+
+### Upload software to on-board computer
+
+```bash
+./upload.sh myarm.local
+```
+Upload script uses rsync to upload which only updates changes and is incrementally very fast.  You will use this script often and you intend to make changes to the code.
+
+### Run the software on-board
+```bash
+# ssh onto the machine and cd to the strongarm dirctory.
+ssh myarm.local && cd ~/strongarm
+# run (on remote) startup script
+./start.sh
+```
+That's pretty much it (if everything works, which it may not).  The start script reads the paths of python scripts that start the needed services (see, `services.cfg`).  Each Python script is launched in the background, the PID is saved (for ./stop.sh), and it's error and std output is saved to ~/strongarm/logs.
+
+### Debugging software problems
+
+#### Are all of the services running on the SBC?
+```bash
+ps -ef | grep python3
+```
+Compare to `services.cfg` to ensure that all of the service python scripts are running.  Note that just because a service has a running process does not mean it is not failing somewhere.
+
+#### Use the webapp
+
+If the web_server.py and central_hub.py components are running, you might be able to get debug information from the web ui at http://myarm.local.  Click on the "HUB STATE" in the upper left corner and scroll down to `subsystemStatus`
+
+#### Inspecting the log files
+
+When started via `./start.sh`, each subsystem redirects its console ouput (stdout and stderr) to log files in `~/strongarm/logs`.
+
+
+#### Missing packages
+
+It is likely that the SBC operating system or Python installed onboard the bot may not have a either an OS package  or a Python package that is required.  These types of errors require [Inspecting the log files]
+
 
 The backend components are written in Python and the web UI served from the bot's Raspberry PI is in Javascript and React.
 
@@ -8,11 +111,6 @@ The [.stl files](https://github.com/littlebee/strongarm/tree/014361c710a28d72579
 
 You can also add different arm configurations, say if you want another 80mm segment or a different effector, you can easily add your own arm config JSON file to the [arm-configs folder](https://github.com/littlebee/strongarm/tree/main/src/webapp/public/arm-configs)
 
-Coming soon! (ish)  [ROS2](https://docs.ros.org/en/foxy/index.html) integration.
-
-<img src="https://github.com/littlebee/strongarm/blob/014361c710a28d72579e17891dc30442e848df3a/docs/strongarm_webui.png"
-     alt="web UI"
-     style="float: right; margin-right: 10px; width: 400px;" />
 
 <img src="https://github.com/littlebee/strongarm/blob/e3338180583ad389d819a77262c7e733812e9a16/docs/IMG_0091.png"
      alt="actual build picture 1"

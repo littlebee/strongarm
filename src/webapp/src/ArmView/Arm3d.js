@@ -111,7 +111,7 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
         const promises = [];
         parts.forEach((part, i) => {
             const promise = new Promise((resolve) => {
-                loader.load(part.part.file, (geometry) => {
+                loader.load("arm-parts/" + part.part.file, (geometry) => {
                     const mesh = new THREE.Mesh(geometry, material);
                     mesh.geometry.center();
                     const pivot = new THREE.Object3D();

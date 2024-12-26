@@ -17,9 +17,9 @@ sudo pip3 install \
     watchfiles \
 
 
-# rc.local calls start.sh
-sudo cp setup/files/etc/rc.local /etc/
-sudo chmod +x setup/files/etc/rc.local
+# # rc.local calls start.sh
+# sudo cp setup/files/etc/rc.local /etc/
+# sudo chmod +x setup/files/etc/rc.local
 
 # # install network manager to create wifi hotspot
 # sudo apt purge -y openresolv dhcpcd5 ifupdown

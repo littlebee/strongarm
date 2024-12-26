@@ -2,6 +2,24 @@
 
 mkdir -p ./logs
 
+
+HELP="
+Usage: ./start.sh [service] [service] ...
+
+Where: [service] = the main python file for the service to start in the
+  form of a relative path from the root of the project to the src/*.py file.
+
+If no services are specified, all services listed in services.cfg will be started.
+Services will be started in the order they are listed in the file.
+
+Example: ./start.sh src/central_hub.py src/strongarm.py
+"
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    echo "$HELP"
+    exit 0
+fi
+
 # user=`echo $USER`
 # if [ "$user" != "root" ]; then
 #     echo "Script must be run as root.  Try 'sudo ./start.sh'"
