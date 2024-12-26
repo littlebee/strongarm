@@ -17,19 +17,20 @@ The software and docs for my robotic arm.
 
 ## Physical build parts needed.
 
-1.  3d print the files in `src/webapp/public/arm-parts`
-2.  Go shopping:
-|quantity|part needed|cost|link|
-|1|20Kgcm 270&deg; servo for iphone rotator|14.99| (amazon)[https://www.amazon.com/gp/product/B0B67YGV66/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&th=1]|
-|1|35Kgcm 270&deg; servo for end effector|28.96| (amazon)[https://www.amazon.com/gp/product/B07S9XZYN2/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1]|
-|2|60Kgcm 270&deg; dual shaft servo for top arm segments|30.00| (amazon)[https://www.amazon.com/gp/product/B0C1BXJWMK/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1]
-|1|150Kgcm 270&deg; dual shaft servo for bottom arm joint|44.00| (amazon)[https://www.amazon.com/gp/product/B0CP126F77/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1]
-|1|60Kgcm 270&deg; single shaft servo for base turntable|34.89| (amazon)[https://www.amazon.com/gp/product/B08HYX5SX3/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1]
-|36| M2 16m cap head bolts (for 3 arm join servos) |6.28| (amazon)[https://www.amazon.com/iexcell-Thread-Socket-Screws-Finish/dp/B0D4JKNJXC/ref=sr_1_3]
-|36| M2 washers | 7.99 | (amazon)[https://www.amazon.com/HELIFOUNER-Pieces-Washers-Diameter-Thickness/dp/B0B5GYG82X/ref=sr_1_3]
-|24| M3 12mm self tapping screws |5.49|(amazon)[https://www.amazon.com/uxcell-Socket-Tapping-Screws-Carbon/dp/B0D9BDK6ZL/ref=sr_1_3]
-|4| M5 20mm button head screws for mounting turn table servo | 8.99 | (amazon)(https://www.amazon.com/gp/product/B0BLNMLHYG/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1)
-|4| M5 nuts | 6.99 | (amazon)[https://www.amazon.com/Stainless-Self-Locking-Industrial-Construction-Fasteners/dp/B09PF4T3HD/ref=sr_1_3_pp]
+### 3d print the files in `src/webapp/public/arm-parts`
+## Go shopping:
+| quantity | part needed | cost | link |
+| -------- | ----------- | ---- | ---- |
+| 1 | 35Kgcm 270&deg; servo for end effector| 28.96 | [amazon](https://www.amazon.com/gp/product/B07S9XZYN2/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1) |
+| 1 | 20Kgcm 270&deg; servo for iphone rotator| 14.99 | [amazon](https://www.amazon.com/gp/product/B0B67YGV66/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&th=1) |
+| 2 | 60Kgcm 270&deg; dual shaft servo for top arm segments| 30.00 | [amazon](https://www.amazon.com/gp/product/B0C1BXJWMK/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1) |
+| 1 | 150Kgcm 270&deg; dual shaft servo for bottom arm joint| 44.00 | [amazon](https://www.amazon.com/gp/product/B0CP126F77/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) |
+| 1 | 60Kgcm 270&deg; single shaft servo for base turntable| 34.89 | [amazon](https://www.amazon.com/gp/product/B08HYX5SX3/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) |
+| 36 | M2 16m cap head bolts (for 3 arm join servos) | 6.28 | [amazon](https://www.amazon.com/iexcell-Thread-Socket-Screws-Finish/dp/B0D4JKNJXC/ref=sr_1_3) |
+| 36 | M2 washers | 7.99 | [amazon](https://www.amazon.com/HELIFOUNER-Pieces-Washers-Diameter-Thickness/dp/B0B5GYG82X/ref=sr_1_3) |
+| 24 | M3 12mm self tapping screws | 5.49 | [amazon](https://www.amazon.com/uxcell-Socket-Tapping-Screws-Carbon/dp/B0D9BDK6ZL/ref=sr_1_3) |
+| 4 | M5 20mm button head screws for mounting turn table servo | 8.99 | [amazon](https://www.amazon.com/gp/product/B0BLNMLHYG/ref=ppx_yo_dt_b_search_asin_title) |
+| 4 | M5 nuts | 6.99 | [amazon](https://www.amazon.com/Stainless-Self-Locking-Industrial-Construction-Fasteners/dp/B09PF4T3HD/ref=sr_1_3_pp) |
 
 ## Onboard computer and micro controller
 
