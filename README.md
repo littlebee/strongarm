@@ -141,6 +141,84 @@ The [.stl files](https://github.com/littlebee/strongarm/tree/af9a326e82ebd4c26b2
 
 You can also add different arm configurations, say if you want another 80mm segment or a different effector, you can easily add your own arm config JSON file to the [arm-configs folder](https://github.com/littlebee/strongarm/tree/main/src/webapp/public/arm-configs)
 
+### Central Hub
+
+Central Hub [src/central_hub.py](https://github.com/littlebee/strongarm/blob/main/src/central_hub.py) is an ultra light weight websockets pub/sub service for the other components that provide (publish) and comsume (subscribe) state.    The authorative state of the overall system (like what angles the servos are set) is owned and maintained by central_hub.
+
+The other services use hub_state and hub_messages to send and receive messages from central hub over a websocket cient connection.   All data sent over the websocket to and from central_hub is in json and has the format:
+```json
+{
+     "type": "string",
+     "data": { ... }
+}
+```
+Where `data` is optional and specific to the type of message. The following messages are supported by `central-hub`:
+
+#### getState
+
+example json:
+
+```json
+{
+  "type": "getState"
+}
+```
+
+Causes `central-hub` to send the full state via message type = "state" to the requesting client socket.
+
+### identity
+
+example json:
+
+```json
+{
+  "type": "identity",
+  "data": "My subsystem name"
+}
+```
+
+Causes `central-hub` to update `subsystems_stats` key of the shared state and send an "iseeu" message back to client socket with the IP address that it sees the client.
+
+### subscribeState
+
+example json:
+
+```json
+{
+  "type": "subscribeState",
+  "data": ["system_stats", "set_angles"]
+}
+```
+
+Causes `central-hub` to add the client socket to the subscribers for each of the state keys provided. Client will start receiving "stateUpdate" messages when those keys are changed. The client may also send `"data": "*"` which will subscribe it to all keys like the web UI does.
+
+### updateState
+
+example json:
+
+```json
+{
+  "type": "updateState",
+  "data": {
+    "set_angles": [127.4, 66.4, 90, 90, 0],
+    "velocity_factor": 1.5
+  }
+}
+```
+
+This message causes `central-hub` merge the receive state and the shared state and send `stateUpdate` messages to any subscribers. Note that the message sent **by clients** (type: "updateState") is a different type than the message **sent to clients** (type: "stateUpdate").
+
+As the example above shows, it is possible to update multiple state keys at once, but most subsystems only ever update one top level key.
+
+The data received must be the **full data for that key**. `central-hub` will replace that top level key with the data received.
+
+### more
+
+For the latest message types and information about the their data structure,  see `messageTypes` [supported in central_hub](https://github.com/littlebee/strongarm/blob/main/src/central_hub.py#L183)
+
+Also look at https://github.com/littlebee/strongarm/blob/main/src/commons/hub_state.py which maintains this application's supported state,  what state keys are persisted, how state is merged from messages.  A few convienience methods for python clients can be found in [src/commons/messages.py](https://github.com/littlebee/strongarm/blob/main/src/commons/messages.py).
+
+On the Javascript side, the webapp has similar components for [hub state](https://github.com/littlebee/strongarm/blob/main/src/webapp/src/util/hubState.js) and [hub messages](https://github.com/littlebee/strongarm/blob/main/src/webapp/src/util/hubMessages.js)
 
 
 
