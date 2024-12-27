@@ -19,6 +19,8 @@ The software and docs for my robotic arm.
 
 ### 3d print the files in `src/webapp/public/arm-parts`
 ## Go shopping:
+Note that I receive no compensation of any form from Amazon, it's just the one place where I know you can find all of these parts.  Please do shop around.  Temu and others have some of these parts for half as much.
+
 | quantity | part needed | cost | link |
 | -------- | ----------- | ---- | ---- |
 | 1 | 35Kgcm 270&deg; servo for end effector| 28.96 | [amazon](https://www.amazon.com/gp/product/B07S9XZYN2/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1) |
@@ -31,14 +33,19 @@ The software and docs for my robotic arm.
 | 24 | M3 12mm self tapping screws | 5.49 | [amazon](https://www.amazon.com/uxcell-Socket-Tapping-Screws-Carbon/dp/B0D9BDK6ZL/ref=sr_1_3) |
 | 4 | M5 20mm button head screws for mounting turn table servo | 8.99 | [amazon](https://www.amazon.com/gp/product/B0BLNMLHYG/ref=ppx_yo_dt_b_search_asin_title) |
 | 4 | M5 nuts | 6.99 | [amazon](https://www.amazon.com/Stainless-Self-Locking-Industrial-Construction-Fasteners/dp/B09PF4T3HD/ref=sr_1_3_pp) |
+| 1 | 5x14x5mm bearing for iphone tilt arm effector. | 7.69 | [amazon](https://www.amazon.com/gp/product/B075CH4JD6/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1) |
+| 1 | 80x105x4mm thrust bearing for turntable base. | 8.78 | [amazon](https://www.amazon.com/gp/product/B07GC94P6Y/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1) |
+| 3 - 4 ft | 3/4" Spiral wrap | 6.99 | [amazon](https://www.amazon.com/gp/product/B0CT8KFDLY/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1) |
+
+You will also need to make or buy extension cables for the upper servos.  You can make your own if you have crimpimg tools and skill, wire, and a set of Dupont connectors something like [this set](https://www.amazon.com/gp/product/B07ZK5F8HP/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1). Or you can just buy [premade servo extension cables](https://www.amazon.com/TecUnite-Extension-Connectors-Connection-Control/dp/B07C18BXDV/ref=sr_1_4_sspa).
 
 ## Onboard computer and micro controller
 
 I have tried be as platform agnostic as I can and the scripts and python code should work with any single board computer and servo controller supported by [Adafruit's servo-kit](https://docs.circuitpython.org/projects/servokit/en/stable/)
 
-I know it works on a Raspberry Pi 4b (4GB), Raspian Bullseye 64, with the [Adeept Motor Hat](https://www.adeept.com/adeept-motor-hat-for-raspberry-pi-smart-robot-car-driver_p0133.html) because I had extra laying around.   The nice thing about the Adeept hat is that it has the power converter that can take any 12 - 60VDC power supplie and also supply clean stable power to the Raspberry Pi.
+I know it works on a Raspberry Pi 4b (4GB), Raspian Bullseye 64, with the [Adeept Motor Hat](https://www.adeept.com/adeept-motor-hat-for-raspberry-pi-smart-robot-car-driver_p0133.html) because I had extra laying around.   The nice thing about the Adeept hat is that it has the power converter that can take any 12 - 60VDC power supply, supply the motors and also supply clean stable 5V power to the Raspberry Pi.
 
-The fixed base model may not fit larger sized SBCs, you will need to rectify that in Tinkercad on your own or house your sbc elsewhere.
+The fixed base model and sbc mounts were designed for the Pi 4/5 and may not fit larger sized SBCs, you will need to rectify that in Tinkercad on your own or house your SBC separately.
 
 
 ## Getting started
@@ -79,7 +86,7 @@ The upload script will default using your local $USER env.   If you want to use 
 ``` bash
 ./upload.sh pi@myarm.local /home/pi/strongarm
 ```
-If you forget to add the directory, you'll likely see a cryptic rsync error in the local terminal.
+If you forget to add the directory when using `user@somehost.local`, you'll likely see a cryptic rsync error in the local terminal.
 
 
 ### Run ./setup.sh on remote SBC
