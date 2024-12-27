@@ -8,9 +8,15 @@ if [ "$1" == "" ]; then
   exit 1
 fi
 
+TARGET_DIR="/home/$USER/strongarm"
+
+if [ "$2" != "" ]; then
+  TARGET_DIR=$2
+fi
+
+# echo on
 set -x
 
-TARGET_DIR="/home/bee/strongarm"
 TARGET_HOST=$1
 
 rsync --progress --partial \

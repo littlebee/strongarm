@@ -75,10 +75,35 @@ I also like to add my public key to the `~/.ssh/authorized_keys` file on the rem
 ```
 Upload script uses rsync to upload which only updates changes and is incrementally very fast.  You will use this script often and you intend to make changes to the code.
 
-### Run the software on-board
+The upload script will default using your local $USER env.   If you want to use a different user ID on the remote, you will need to specify both the host with user@ prefix and the directory to upload to:
+``` bash
+./upload.sh pi@myarm.local /home/pi/strongarm
+```
+If you forget to add the directory, you'll likely see a cryptic rsync error in the local terminal.
+
+
+### Run ./setup.sh on remote SBC
 ```bash
 # ssh onto the machine and cd to the strongarm dirctory.
-ssh myarm.local && cd ~/strongarm
+ssh myarm.local
+cd ~/strongarm
+./setup.sh
+```
+You will need to confirm any packages that need to be installed.
+
+Optional:  If you want the robot to start all of the services on boot, you can run these lines from the comments in `./setup.sh` script:
+```bash
+# rc.local calls start.sh
+sudo cp setup/files/etc/rc.local /etc/
+sudo chmod +x setup/files/etc/rc.local
+```
+
+
+### Run the software on the remote
+```bash
+# ssh onto the machine and cd to the strongarm dirctory.
+ssh myarm.local
+cd ~/strongarm
 # run (on remote) startup script
 ./start.sh
 ```
@@ -94,7 +119,7 @@ Compare to `services.cfg` to ensure that all of the service python scripts are r
 
 #### Use the webapp
 
-If the web_server.py and central_hub.py components are running, you might be able to get debug information from the web ui at http://myarm.local.  Click on the "HUB STATE" in the upper left corner and scroll down to `subsystemStatus`
+If the web_server.py and central_hub.py services are running, you might be able to get debug information from the web ui at http://myarm.local.  Click on the "HUB STATE" in the upper left corner and scroll down to `subsystemStatus`
 
 #### Inspecting the log files
 
@@ -103,15 +128,23 @@ When started via `./start.sh`, each subsystem redirects its console ouput (stdou
 
 #### Missing packages
 
-It is likely that the SBC operating system or Python installed onboard the bot may not have a either an OS package  or a Python package that is required.  These types of errors require [Inspecting the log files]
+It is likely that the SBC operating system or Python installed onboard the bot may not have a either an OS package  or a Python package that is required.  These types of errors require [Inspecting the log files] to see the error that indicates which package(s) are missing at runtime.
 
+If you find a missing package, please be a sport and add it to `setup.sh` and submit a PR, or just open an issue and let us know if something is missing.
+
+
+## How it all comes together
 
 The backend components are written in Python and the web UI served from the bot's Raspberry PI is in Javascript and React.
 
-The [.stl files](https://github.com/littlebee/strongarm/tree/014361c710a28d72579e17891dc30442e848df3a/src/webapp/public) for the 3d parts I designed in Fusion 360 are actually used along with [three.js](https://threejs.org/) to render the arm in the web UI.  You can 3d print the parts from the .stl files.  For my build pictured, I used Bambu Labs PLA-CF filament, at 0.2mm line height with 50% rectilinier infill.
+The [.stl files](https://github.com/littlebee/strongarm/tree/af9a326e82ebd4c26b2b3a7a883eda1c00eed1a0/src/webapp/public/arm-configs) for the 3d parts I designed in Fusion 360 are actually used along with [three.js](https://threejs.org/) to render the arm in the web UI.  You can 3d print the parts from the .stl files directly from the .stl files in src/webapp/putlic/arm-parts.  For my build pictured, I used Bambu Labs PLA-CF filament, at 0.2mm line height with 50% rectilinier infill.
 
 You can also add different arm configurations, say if you want another 80mm segment or a different effector, you can easily add your own arm config JSON file to the [arm-configs folder](https://github.com/littlebee/strongarm/tree/main/src/webapp/public/arm-configs)
 
+
+
+
+## Gallery
 
 <img src="https://github.com/littlebee/strongarm/blob/e3338180583ad389d819a77262c7e733812e9a16/docs/IMG_0091.png"
      alt="actual build picture 1"
