@@ -161,7 +161,7 @@ If you find a missing package, please be a sport and add it to `setup.sh` and su
 
 ## How it all works
 
-<img src="https://github.com/littlebee/strongarm/blob/014361c710a28d72579e17891dc30442e848df3a/docs/strongarm_arch1_diagram.png"
+<img src="https://github.com/littlebee/strongarm/blob/main/docs/strongarm_arch1_diagram.png"
      alt="web UI"
      style="float: right; margin-right: 10px; width: 600px;" />
 
