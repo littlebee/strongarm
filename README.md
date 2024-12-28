@@ -50,7 +50,7 @@ The fixed base model and sbc mounts were designed for the Pi 4/5 and may not fit
 
 ## Getting started
 
-1. buy / or build 👆 the arm.
+### buy / or build 👆 the arm.
 
 For build help, here is the link to a web mockup shared from my fusion 360 disigns that shows the build with servos in place:  https://a360.co/3Phep9W
 
@@ -75,7 +75,7 @@ I work on a macbook and use iTerm2 for terminal.  One of the additions I like to
 
 I also like to add my public key to the `~/.ssh/authorized_keys` file on the remote SBC. This will stop it from prompting you for the password on every SSH command (upload.sh uses rsync which uses ssh).   I made a [gist of the script](https://gist.github.com/littlebee/b285f0b9d219e56fe29b7248440309a5) I use to upload my public key to new boards.
 
-### Upload software to on-board computer
+### Upload software to on-board SBC
 
 ```bash
 ./upload.sh myarm.local
@@ -118,7 +118,7 @@ That's pretty much it (if everything works, which it may not).  The start script
 
 ### Debugging software problems
 
-#### Are all of the services running on the SBC?
+#### Are all of the services running on the on-board SBC?
 ```bash
 ps -ef | grep python3
 ```

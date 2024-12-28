@@ -14,10 +14,13 @@ import psutil
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 
-from commons import web_utils
+from commons import web_utils, hub_state
+from commons.hub_state_monitor import HubStateMonitor
 
 app = Flask(__name__, static_url_path="/static")
 CORS(app, supports_credentials=True)
+
+_hub_state_monitor = HubStateMonitor("webserver", "*")
 
 dir_path = os.path.dirname(os.path.realpath(__file__)) + "/webapp/build"
 
@@ -42,6 +45,11 @@ def send_stats():
             },
         },
     )
+
+
+@app.route("/state")
+def send_state():
+    return web_utils.json_response(app, hub_state.state)
 
 
 @app.route("/<path:filename>")

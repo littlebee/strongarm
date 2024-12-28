@@ -42,6 +42,7 @@ persisted_state_keys = [
 ]
 
 
+# This should only be called by central_hub
 def init_persisted_state():
     # if persisted state file exists, load it
     try:
@@ -91,3 +92,11 @@ def update_state_from_message_data(message_data):
         state[key] = data
         state[f"{key}_updated_at"] = time.time()
     return
+
+
+def start_state_update_thread():
+    log.info("state update thread started")
+    while True:
+        time.sleep(1)
+        state["hub_stats"]["state_updates_recv"] += 1
+        log.debug(f"state updated: {state}")
