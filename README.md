@@ -13,12 +13,31 @@ The software and docs for my robotic arm.
      alt="web UI"
      style="float: right; margin-right: 10px; width: 400px;" />
 
-
+## Table of Contents
+  - [Physical build parts needed](#physical-build-parts-needed)
+    - [3d print the files in `src/webapp/public/arm-parts`](#3d-print-the-files-in-srcwebapppublicarm-parts)
+     - [Go shopping](#go-shopping)
+  - [Onboard computer and micro controller](#onboard-computer-and-micro-controller)
+  - [Getting started](#getting-started)
+    - [buy / or build 👆 the arm](#buy--or-build--the-arm)
+    - [Clone this repo](#clone-this-repo)
+    - [SSH or bust](#ssh-or-bust)
+    - [Upload software to on-board SBC](#upload-software-to-on-board-sbc)
+    - [Run ./setup.sh on remote SBC](#run-setupsh-on-remote-sbc)
+    - [Run the software on the remote](#run-the-software-on-the-remote)
+    - [Debugging software problems](#debugging-software-problems)
+      - [Are all of the services running on the on-board SBC?](#are-all-of-the-services-running-on-the-on-board-sbc)
+      - [Use the webapp](#use-the-webapp)
+      - [Inspecting the log files](#inspecting-the-log-files)
+      - [Missing packages](#missing-packages)
+  - [How it all works](#how-it-all-works)
+    - [Central Hub](#central-hub)
+  - [Gallery](#gallery)
 
 ## Physical build parts needed.
 
 ### 3d print the files in `src/webapp/public/arm-parts`
-## Go shopping:
+### Go shopping:
 Note that I receive no compensation of any form from Amazon, it's just the one place where I know you can find all of these parts.  Please do shop around.  Temu and others have some of these parts for half as much.
 
 | quantity | part needed | cost | link |
@@ -140,7 +159,12 @@ It is likely that the SBC operating system or Python installed onboard the bot m
 If you find a missing package, please be a sport and add it to `setup.sh` and submit a PR, or just open an issue and let us know if something is missing.
 
 
-## How it all comes together
+## How it all works
+
+<img src="https://github.com/littlebee/strongarm/blob/014361c710a28d72579e17891dc30442e848df3a/docs/strongarm_arch1_diagram.png"
+     alt="web UI"
+     style="float: right; margin-right: 10px; width: 600px;" />
+
 
 The backend components are written in Python and the web UI served from the bot's Raspberry PI is in Javascript and React.
 
