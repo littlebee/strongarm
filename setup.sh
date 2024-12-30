@@ -15,6 +15,12 @@ sudo pip3 install \
     websockets==10.4 \
     websocket-client \
     watchfiles \
+    urdfpy \
+
+
+# urdfpy <= 2.2 will fail on import unless NetworkX 2.6.3 is installed
+sudo pip3 install --force \
+    NetworkX==2.6.3
 
 
 # # rc.local calls start.sh

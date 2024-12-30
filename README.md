@@ -82,7 +82,7 @@ git clone https://github.com/littlebee/strongarm.git
 
 ### SSH or bust
 
-You will need to be able to SSH into the onboard computer to upload code to the SBC.  Ensure that you can successfully log-in,
+You will need to be able to SSH into the onboard computer to upload code.  Ensure that you can successfully log-in,
 ```bash
 ssh myrobotarm.local
 ```
@@ -176,7 +176,9 @@ You can also add different arm configurations, say if you want another 80mm segm
 
 Central Hub [src/central_hub.py](https://github.com/littlebee/strongarm/blob/main/src/central_hub.py) is an ultra light weight websockets pub/sub service for the other components that provide (publish) and comsume (subscribe) state.    The authorative state of the overall system (like what angles the servos are set) is owned and maintained by central_hub.
 
-The other services use hub_state and hub_messages to send and receive messages from central hub over a websocket cient connection.   All data sent over the websocket to and from central_hub is in json and has the format:
+The other Python services (processes) use [hub_state.py](https://github.com/littlebee/strongarm/blob/d97ad335952894e5fbf8899775c25bc45a2050fd/src/commons/hub_state.py) and also optionally [messages.py](https://github.com/littlebee/strongarm/blob/main/src/commons/messages.py) [hub_state_monitor.py](https://github.com/littlebee/strongarm/blob/d97ad335952894e5fbf8899775c25bc45a2050fd/src/commons/hub_state_monitor.py) to send and receive messages from central hub over a websocket cient connection and maintain their own local copies of the subscribed keys of the current state.
+
+All data sent over the websocket to and from central_hub is in json and has the format:
 ```json
 {
      "type": "string",

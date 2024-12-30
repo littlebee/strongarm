@@ -13,7 +13,6 @@ from watchdog.events import FileSystemEventHandler
 from commons import constants as c, messages, log
 
 SAVED_CONFIG_FILE = ".current_arm_config"
-ARM_CONFIGS_DIR = "./src/webapp/public/arm-configs"
 
 
 arm_config_files = []
@@ -23,7 +22,7 @@ connected_socket = None
 
 def load_arm_config_filenames():
     global arm_config_files
-    arm_config_files = [f for f in os.listdir(ARM_CONFIGS_DIR) if f.endswith(".json")]
+    arm_config_files = [f for f in os.listdir(c.ARM_CONFIGS_DIR) if f.endswith(".json")]
     log.info(f"loaded arm_configs: {arm_config_files}")
     return arm_config_files
 
@@ -53,7 +52,7 @@ async def initialize_arm_configs():
 
 
 async def load_arm_config(arm_config_json_file):
-    with open(f"{ARM_CONFIGS_DIR}/{arm_config_json_file}") as f:
+    with open(f"{c.ARM_CONFIGS_DIR}/{arm_config_json_file}") as f:
         global current_arm_config
         current_arm_config = json.load(f)
         current_arm_config["filename"] = arm_config_json_file
@@ -148,7 +147,7 @@ class FileChangeHandler(FileSystemEventHandler):
 
 event_handler = FileChangeHandler()
 observer = Observer()
-observer.schedule(event_handler, path=ARM_CONFIGS_DIR, recursive=True)
+observer.schedule(event_handler, path=c.ARM_CONFIGS_DIR, recursive=True)
 observer.start()
 
 

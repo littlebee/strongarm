@@ -36,3 +36,5 @@ HUB_PORT = env_int("HUB_PORT", 5800)
 HUB_URI = f"ws://127.0.0.1:{HUB_PORT}/ws"
 
 LOG_ALL_MESSAGES = env_bool("LOG_ALL_MESSAGES", False)
+
+ARM_CONFIGS_DIR = env_string("ARM_CONFIGS_DIR", "./src/webapp/public/arm-configs")

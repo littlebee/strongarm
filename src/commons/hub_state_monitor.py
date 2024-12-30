@@ -18,12 +18,23 @@ from commons import constants, messages, log, hub_state
 
 class HubStateMonitor:
     """
-    This class updates the local copy of the hub state as subscribed keys are changed.
+    This class updates the process local copy of the hub state as subscribed keys
+    are changed.  It starts a thread to listen for state updates from the central
+    hub and applies them to the local state via hub_state.update_state_from_message_data.
+
+    This class is a singleton.  Only one instance should be created per process.
     """
 
-    thread = None  # background thread that reads frames from camera
+    # background thread connects to central_hub and listens for state updates
+    thread = None
+
+    # web socket if we are connected, None otherwise
+    connected_socket = None
+
+    # these should be provided to the constructor
     identity = "hub_state_monitor"
-    subscribed_keys = "*"  # all keys
+    # "*" subscribes to all keys or you can pass an array of keys
+    subscribed_keys = "*"
 
     def __init__(self, identity, subscribed_keys):
         HubStateMonitor.identity = identity
@@ -41,6 +52,7 @@ class HubStateMonitor:
                     f"hub_state_monitor connecting to hub central at {constants.HUB_URI}"
                 )
                 async with websockets.connect(constants.HUB_URI) as websocket:
+                    cls.connected_socket = websocket
                     await messages.send_identity(websocket, cls.identity)
                     await messages.send_get_state(websocket)
                     await messages.send_subscribe(websocket, cls.subscribed_keys)
@@ -54,6 +66,7 @@ class HubStateMonitor:
             except:
                 traceback.print_exc()
 
+            cls.connected_socket = None
             log.info("central_hub socket disconnected.  Reconnecting in 5 sec...")
             time.sleep(5)
 
