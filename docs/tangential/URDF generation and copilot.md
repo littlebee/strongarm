@@ -4,7 +4,25 @@
 
 This is a journal of my experience in using copilot to generate URDF from a mock arm config (the current 4dof + iphone pan tilt effector config).
 
+### 20250101.2
 
+Woot! We have a valid URDF based on validations from [here](http://wiki.ros.org/urdf)
+
+### 20250101
+
+Tried giving claude a python file with just a mock_arm_config={...} and the command, "using the XML schema found at https://raw.githubusercontent.com/ros/urdfdom/master/xsd/urdf.xsd, use ElementTree in python 3.13 to convert arm_config to a URDF XML file"
+
+Claude Sonnet 3.5
+✅  It generated pretty decent code - although one of the functions a bit long for my tastes
+✅  Code generated has zero run time errors
+✅  XML generated is formatted and indented for human readability.
+❌  XML generated does not cleanly validate with tools used yesterday.  Same two warnings/errors as yesterday.
+
+Gpt 4o
+✅  It generated generated good looking, readable codecode
+✅  Code generated has zero run time errors
+❌  XML generated was not formatted and indented for human readability.  I tried to ask it after the fact to "make the XML generated human readable - the answer was code with RT errors :/
+❌  XML generated does not cleanly validate with tools used yesterday.  Same two warnings/errors as yesterday.
 
 
 ### 20241231
