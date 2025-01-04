@@ -36,7 +36,7 @@ class TestStrongarm:
         ws.close()
 
     def test_clamped_angles_change(self):
-        test_angles = [15, 55, 180, 115, 95, 5]
+        test_angles = [15, 55, 400, 115, 95, 5]
         expected_clamped_angles = [15, 55, 180, 115, 95, 5]
         ws = hub.connect()
         hub.send_subscribe(ws, ["set_angles", "current_angles"])
@@ -47,10 +47,25 @@ class TestStrongarm:
         # send a set_angles update to the strongarm
         hub.send_state_update(ws, {"set_angles": test_angles})
 
-        print("waiting for current_angles update")
-        # it should respond within 100ms with a current_angles update
+        print("waiting for set_angles updates")
+        # it should respond within 100ms first with the set_angles we sent above..
+        updated_state = hub.recv(ws)
+        print(f"{updated_state=}")
+        assert updated_state["data"]["set_angles"] == test_angles
+        # ... and then it should send the clamped angles from stromgarm
         updated_state = hub.recv(ws)
         print(f"{updated_state=}")
         assert updated_state["data"]["set_angles"] == expected_clamped_angles
+
+        # it should respond within 100ms with a current_angles update
+        print("waiting for current_angles update")
+        updated_state = hub.recv(ws)
+        updated_current_angles = updated_state["data"]["current_angles"]
+        print(f"Received updated state: {updated_state=}")
+        assert (
+            updated_current_angles
+            and len(updated_current_angles) == 6
+            and updated_current_angles != initial_state["data"]["current_angles"]
+        )
 
         ws.close()

@@ -182,14 +182,18 @@ async def hubstate_consumer_task():
             await asyncio.sleep(5)
 
 
-async def main():
-    log.info("creating task current_angles_provider_task")
-    t1 = asyncio.create_task(current_angles_provider_task())
-    log.info("created task current_angles_provider_task")
-    t2 = asyncio.create_task(hubstate_consumer_task())
+# # Another way to run the tasks instead of creating the provider task in the consumer task
+# # I switched to the current way because I wasn't sure if it was safe to share the websocket
+# # between the two tasks using a global variable
+# async def main():
+#     log.info("creating task current_angles_provider_task")
+#     t1 = asyncio.create_task(current_angles_provider_task())
+#     log.info("created task current_angles_provider_task")
+#     t2 = asyncio.create_task(hubstate_consumer_task())
 
-    # Wait for all tasks to complete
-    await asyncio.gather(t1, t2)
+#     # Wait for all tasks to complete
+#     await asyncio.gather(t1, t2)
 
+# asyncio.run(hubstate_consumer_task())
 
 asyncio.run(hubstate_consumer_task())
