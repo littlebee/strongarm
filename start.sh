@@ -28,6 +28,8 @@ fi
 
 declare -a to_start=()
 
+export LOG_ALL_MESSAGES=1
+
 if [ $# -ne 0 ]; then
     to_start=($@)
     sleep=0

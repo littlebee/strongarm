@@ -1,8 +1,10 @@
 
 
-#### URDF generation and VsCode Copilot
+# URDF generation and VsCode Copilot
 
 This is a journal of my experience in using copilot to generate URDF from a mock arm config (the current 4dof + iphone pan tilt effector config).
+
+## Entries
 
 ### 20250101.2
 

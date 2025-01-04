@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 
 import { classnames } from "../util/classNames";
 import st from "./index.module.css";
@@ -6,6 +6,7 @@ import { BackButton } from "../components/icons/BackButton";
 
 import { ArmConfig } from "./ArmConfig";
 import { SavedPositions } from "./SavedPositions";
+import { sendSetAngles } from "../util/hubMessages";
 
 const BASE_NODE_NAME = "Menu Root";
 
@@ -24,14 +25,29 @@ const MenuLeft = ({ hubState }) => {
         // the item is clicked
         component: React.Component?
     */
-    const items = [
-        { name: "Arm Config", component: <ArmConfig hubState={hubState} /> },
-        {
-            name: "Saved Positions",
-            component: <SavedPositions hubState={hubState} />,
-        },
-        { name: "Sequence", component: <div>Sequence component here</div> },
-    ];
+    const items = useMemo(
+        () => [
+            {
+                name: "Arm Config",
+                component: <ArmConfig hubState={hubState} />,
+            },
+            {
+                name: "Saved Positions",
+                component: <SavedPositions hubState={hubState} />,
+            },
+            { name: "Sequence", component: <div>Sequence component here</div> },
+        ],
+        [hubState]
+    );
+
+    const movablePartCount = useMemo(
+        () =>
+            hubState.arm_config.arm_parts.reduce(
+                (acc, part) => (part.movable ? acc + 1 : acc),
+                0
+            ),
+        [hubState.arm_config.arm_parts]
+    );
 
     const menuName = isAtRootMenu
         ? BASE_NODE_NAME
@@ -43,6 +59,10 @@ const MenuLeft = ({ hubState }) => {
 
     const handleBackClick = useCallback(() => {
         setItemIndexSelected(null);
+    });
+
+    const handleResetClick = useCallback(() => {
+        sendSetAngles(Array(movablePartCount).fill(90));
     });
 
     const buttonsStyle = isAtRootMenu ? { left: 0 } : { left: "-100%" };
@@ -62,6 +82,8 @@ const MenuLeft = ({ hubState }) => {
                         {item.name}
                     </a>
                 ))}
+                <div className={st.vspacer} />
+                <a onClick={handleResetClick}>Reset All Angles</a>
             </div>
             <div className={st.componentContainer} style={componentStyle}>
                 {itemIndexSelected != null &&

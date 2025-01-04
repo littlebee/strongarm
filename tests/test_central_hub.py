@@ -1,4 +1,5 @@
 import helpers.central_hub as hub
+import helpers.start_stop as sss
 
 # semi-random values to use for testing
 TEST_ANGLES_1 = [10, 50, 180, 120, 90, 0]
@@ -6,11 +7,11 @@ TEST_ANGLES_2 = [15, 55, 175, 115, 95, 5]
 
 
 def setup_module():
-    hub.start()
+    sss.start_services(["central_hub"])
 
 
 def teardown_module():
-    hub.stop()
+    sss.stop_services(["central_hub"])
 
 
 class TestCentralHub:
@@ -40,12 +41,12 @@ class TestCentralHub:
         ws.close()
 
     def test_pubsub(self):
-        ws1 = hub.connect()
+        ws1 = hub.connect("test_client_1")
         hub.send_subscribe(ws1, ["set_angles", "current_angles"])
         # should not have received anything in response to subscribe
         assert not hub.has_received_data(ws1)
 
-        ws2 = hub.connect()
+        ws2 = hub.connect("test_client_2")
         hub.send_subscribe(ws2, ["current_angles"])
 
         # second client sends a set_angles update
@@ -74,7 +75,7 @@ class TestCentralHub:
         # first client sends a feeder update which neither clients are subscribed
         hub.send_state_update(ws1, {"feeder": TEST_ANGLES_1})
         assert not hub.has_received_data(ws1)
-        assert not hub.has_received_data(ws1)
+        assert not hub.has_received_data(ws2)
 
         # after all of the above, our state should reflect all changes
         hub.send(ws1, {"type": "getState"})

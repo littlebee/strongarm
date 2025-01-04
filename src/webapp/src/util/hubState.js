@@ -2,7 +2,8 @@ import "react";
 
 const urlParams = new URLSearchParams(window.location.search);
 const debugThings = urlParams.get("debug")?.split(",") || [];
-const logMessages = debugThings.indexOf("messages") >= 0;
+
+export const logMessages = debugThings.indexOf("messages") >= 0;
 
 // How often to check if hub is really still alive
 const HUB_PING_INTERVAL = 1000;
@@ -114,7 +115,7 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
             if (message.type === "pong") {
                 return;
             }
-            log("got message from central-hub", {
+            logMessage("got message from central-hub", {
                 raw: event.data,
                 parsed: message,
             });
@@ -203,7 +204,7 @@ function onConnError(state, e) {
 
 // not exported, should only be called from connectToHub
 function setHubConnStatus(newStatus) {
-    log("setting conn status", newStatus);
+    logMessage("setting conn status", newStatus);
     __hub_state.hubConnStatus = newStatus;
     emitUpdated();
 }
@@ -223,7 +224,7 @@ function emitUpdated() {
     }
 }
 
-function log(...args) {
+export function logMessage(...args) {
     if (logMessages) {
         console.log(...args);
     }

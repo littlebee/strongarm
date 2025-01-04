@@ -1,6 +1,13 @@
 import json
+from enum import Enum
 
 from commons import log, constants as c
+
+
+class MessageType(Enum):
+    STATE_UPDATE = "stateUpdate"
+    STATE = "state"
+    IDENTITY = "iseeu"
 
 
 async def send_message(websocket, message):

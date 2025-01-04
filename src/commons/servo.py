@@ -27,6 +27,8 @@ STEP_DEGREES = 1
 # how long to wait between steps (default; use step_delay setter to change at run time)
 DEFAULT_STEP_DELAY = 0.0001
 
+# the precision of the servo motors in degrees
+SERVO_PRECISION = 0.5
 
 servo_kit = ServoKit(channels=16)
 
@@ -83,12 +85,20 @@ class Servo:
         self._step_delay = value
 
     def move_to(self, angle):
-        self.destination_angle = limit_angle(angle, self.min_angle, self.max_angle)
+        new_angle = limit_angle(angle, self.min_angle, self.max_angle)
         if DEBUG_MOTORS:
             log.info(
                 f"move_to {self.motor_channel}, {self.current_angle}, {angle}, {self.destination_angle}, {self.min_angle}, {self.max_angle}"
             )
 
+        if abs(self.destination_angle - new_angle) < SERVO_PRECISION:
+            if DEBUG_MOTORS:
+                log.info(
+                    f"{self.current_angle} already at destination angle {self.destination_angle}"
+                )
+            return
+
+        self.destination_angle = new_angle
         self.stopped_event.clear()
         self.resume()
 
@@ -133,15 +143,15 @@ class Servo:
 
             if DEBUG_MOTORS:
                 log.info(
-                    f"servo.py thread loop: direction={direction} {self.current_angle} {self.destination_angle} "
+                    f"servo.py thread loop: channel={self.motor_channel} direction={direction} {self.current_angle} {self.destination_angle} "
                 )
             if not self._step_move(direction):
                 if DEBUG_MOTORS:
-                    log.info(f"setting stopped event on channel {self.motor_channel}")
+                    log.info(f"setting stopped event on channel={self.motor_channel}")
                 self.stopped_event.set()
                 self.pause_event.clear()
 
-        log.info("servo thread exit")
+        log.info("servo thread exit on channel={self.motor_channel}")
 
     def _step_move(self, direction):
         """direction = -1 = left; 1 = right.  returns true if did move"""
@@ -149,7 +159,7 @@ class Servo:
             would_overshoot = self._step_would_overshoot_dest(direction)
             if DEBUG_MOTORS:
                 log.info(
-                    f"stepping motor {self.motor_channel}, {direction}, {self.current_angle}, {self.destination_angle}, {would_overshoot}"
+                    f"stepping channel={self.motor_channel}, {direction}, {self.current_angle}, {self.destination_angle}, {would_overshoot}"
                 )
 
             if self.current_angle == self.destination_angle:
@@ -168,7 +178,9 @@ class Servo:
 
             return True
         except Exception:
-            log.error(f"Exception caught in _step_move: {traceback.format_exc()}")
+            log.error(
+                f"Exception caught in _step_move for channel={self.motor_channel}: {traceback.format_exc()}"
+            )
             return False
 
     def _step_would_overshoot_dest(self, direction):

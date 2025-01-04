@@ -1,7 +1,7 @@
-import { webSocket } from "./hubState";
+import { webSocket, logMessage } from "./hubState";
 
 export function sendHubStateUpdate(data) {
-    console.log("sending state update", { data, webSocket });
+    logMessage("sending state update", { data, webSocket });
     if (webSocket) {
         webSocket.send(
             JSON.stringify({

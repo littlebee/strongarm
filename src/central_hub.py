@@ -4,6 +4,8 @@ import logging
 import json
 import asyncio
 import websockets
+import traceback
+
 
 from commons import constants, hub_state, log
 
@@ -61,11 +63,17 @@ async def send_state_update_to_subscribers(message_data):
         }
     )
     for socket in subscribed_sockets:
-        await send_message(socket, relay_message)
+        try:
+            await send_message(socket, relay_message)
+        except Exception as e:
+            log.error(
+                f"error sending message to subscriber {socket.remote_address[1]}: {e}"
+            )
+            traceback.print_exc()
 
 
 async def notify_state(websocket="all"):
-    await send_message(websocket, hub_state.serializeState())
+    await send_message(websocket, hub_state.serialize_state())
 
 
 # NOTE that there is no "all" option here, need a websocket,
@@ -168,7 +176,7 @@ async def handlePing(websocket):
     await send_message(websocket, json.dumps({"type": "pong"}))
 
 
-async def handleMessage(websocket, path):
+async def handleMessage(websocket):
     await register(websocket)
     try:
         async for message in websocket:
@@ -197,11 +205,15 @@ async def handleMessage(websocket, path):
             elif messageType == "ping":
                 await handlePing(websocket)
             else:
-                logging.error("received unsupported message: %s", messageType)
+                log.error("received unsupported message: %s", messageType)
+
+            if constants.LOG_ALL_MESSAGES and messageType != "ping":
+                log.info(f"getting next message for {websocket.remote_address[1]}")
 
     except Exception as e:
-        log.error(f"handleMessage: {e}")
-        raise
+        log.error(f"handleMessage from {websocket.remote_address[1]}: {e}")
+        traceback.print_exc()
+        raise e
 
     finally:
         await unregister(websocket)

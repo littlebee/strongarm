@@ -1,11 +1,13 @@
-import time
 import json
+import time
+from typing import Dict, Any, List
+from logging import getLogger
 
-from commons import log
+log = getLogger(__name__)
 
 PERSISTED_STATE_FILE = "./persisted_state.json"
 
-state = {
+state: Dict[str, Any] = {
     # provided by central_hub/
     "hub_stats": {"state_updates_recv": 0},
     # last requested angles
@@ -36,14 +38,14 @@ state = {
     "saved_positions": [],
 }
 
-persisted_state_keys = [
+persisted_state_keys: List[str] = [
     "arm_config_selected",
     "saved_positions",
 ]
 
 
 # This should only be called by central_hub
-def init_persisted_state():
+def init_persisted_state() -> None:
     # if persisted state file exists, load it
     try:
         with open(PERSISTED_STATE_FILE, "r") as f:
@@ -59,36 +61,30 @@ def init_persisted_state():
     log.info(f"initial state: {state}")
 
 
-def persist_state():
-    persisted_state = {}
-    for key in persisted_state_keys:
-        persisted_state[key] = state[key]
-    with open(PERSISTED_STATE_FILE, "w") as f:
-        json.dump(persisted_state, f, indent=4)
+def persist_state() -> None:
+    """Persist specified state keys to file."""
+    try:
+        persisted_state = {
+            key: state[key] for key in persisted_state_keys if key in state
+        }
+        with open(PERSISTED_STATE_FILE, "w") as f:
+            json.dump(persisted_state, f, indent=4)
+    except (IOError, json.JSONDecodeError) as e:
+        log.error(f"Failed to persist state: {e}")
 
 
-def serializeState():
-    return json.dumps({"type": "state", "data": state})
+def serialize_state() -> str:
+    """Serialize current state to JSON string."""
+    try:
+        return json.dumps({"type": "state", "data": state})
+    except json.JSONDecodeError as e:
+        log.error(f"Failed to serialize state: {e}")
+        return json.dumps({"type": "state", "data": {}})
 
 
-def update_state_from_message_data(message_data):
-    for key in message_data:
-        data = message_data[key]
-        if key == "set_angles":
-            arm_parts = state.get("arm_config", {}).get("arm_parts", [])
-            movable_parts = [part for part in arm_parts if not part.get("fixed")]
-            log.info(f"got set_angles {movable_parts}")
-            # clamp angles to min/max
-            for i in range(len(movable_parts)):
-                partMin = movable_parts[i].get("minAngle") or 0
-                partMax = movable_parts[i].get("maxAngle") or 180
-                if data[i] < 0:
-                    # TODO : this case is specific to how the ArmAngleControl is implemented
-                    #    and should probably be moved there
-                    data[i] = partMax if data[i] < -(180 - 45) else partMin
-                else:
-                    data[i] = max(partMin, min(partMax, data[i]))
-
+def update_state_from_message_data(message_data: Dict[str, Any]) -> None:
+    global state
+    """Update state from received message data."""
+    for key, data in message_data.items():
         state[key] = data
         state[f"{key}_updated_at"] = time.time()
-    return

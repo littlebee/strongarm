@@ -1,6 +1,4 @@
 import json
-import os
-import time
 
 import helpers.constants as tc
 
@@ -13,31 +11,17 @@ import websocket
 websocket.enableTrace(True)
 
 
-def start():
-    """starts central hub as a detached process using same start script used to start on the bot"""
-    cmd = f"LOG_ALL_MESSAGES=1 HUB_PORT={tc.CENTRAL_HUB_TEST_PORT} ./start.sh src/central_hub.py"
-    exit_code = os.system(cmd)
-    assert exit_code == 0
-    time.sleep(1)
-
-
-def stop():
-    """stops central hub and dumps it's log file"""
-    exit_code = os.system("./stop.sh src/central_hub.py")
-
-    # note that this only shows when a test module fails
-    print("\ncentral_hub logs")
-    print("===================================================================")
-    os.system("cat logs/central_hub.py.log")
-    print("===================================================================")
-
-    assert exit_code == 0
-
-
-def connect():
+def connect(identity=None):
     """connect to central hub and return a websocket (websocket-client lib)"""
-    ws = websocket.create_connection(f"ws://localhost:{tc.CENTRAL_HUB_TEST_PORT}/ws")
-    ws.settimeout(tc.DEFAULT_TIMEOUT)
+    ws = websocket.create_connection(
+        f"ws://localhost:{tc.CENTRAL_HUB_TEST_PORT}/ws", timeout=tc.DEFAULT_TIMEOUT
+    )
+
+    if identity:
+        send(ws, {"type": "identity", "data": identity})
+        # clear the iseeu response
+        assert recv(ws)
+
     return ws
 
 
