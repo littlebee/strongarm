@@ -17,7 +17,7 @@ connected_sockets = set()
 # dictionary key in hub_state
 subscribers = dict()
 
-# a dictionary of websocket to subsystem name; see handleIdentity
+# a dictionary of websocket to subsystem name; see handle_identity
 identities = dict()
 
 
@@ -62,6 +62,7 @@ async def send_state_update_to_subscribers(message_data):
             "data": message_data,
         }
     )
+    sockets_to_close = set()
     for socket in subscribed_sockets:
         try:
             await send_message(socket, relay_message)
@@ -70,6 +71,12 @@ async def send_state_update_to_subscribers(message_data):
                 f"error sending message to subscriber {socket.remote_address[1]}: {e}"
             )
             traceback.print_exc()
+            sockets_to_close.add(socket)
+
+    for socket in sockets_to_close:
+        log.info(f"relay error: closing socket {socket.remote_address[1]}")
+        await unregister(socket)
+        socket.close()
 
 
 async def notify_state(websocket="all"):
@@ -117,11 +124,11 @@ async def unregister(websocket):
         pass
 
 
-async def handleStateRequest(websocket):
+async def handle_state_request(websocket):
     await notify_state(websocket)
 
 
-async def handleStateUpdate(message_data):
+async def handle_state_update(message_data):
     global subscribers
 
     hub_state.update_state_from_message_data(message_data)
@@ -130,7 +137,7 @@ async def handleStateUpdate(message_data):
     await send_state_update_to_subscribers(message_data)
 
 
-async def handleStateSubscribe(websocket, data):
+async def handle_state_subscribe(websocket, data):
     global subscribers
     subscription_keys = []
     if data == "*":
@@ -152,7 +159,7 @@ async def handleStateSubscribe(websocket, data):
         socket_set.add(websocket)
 
 
-async def handleStateUnsubscribe(websocket, data):
+async def handle_state_unsubscribe(websocket, data):
     global subscribers
     subscription_keys = []
     if data == "*":
@@ -165,18 +172,18 @@ async def handleStateUnsubscribe(websocket, data):
             subscribers[key].remove(websocket)
 
 
-async def handleIdentity(websocket, subsystem_name):
+async def handle_identity(websocket, subsystem_name):
     identities[websocket] = subsystem_name
     log.info(f"setting identity of {websocket.remote_address[1]} to {subsystem_name}")
     await update_online_status(subsystem_name, 1)
     await notify_iseeu(websocket)
 
 
-async def handlePing(websocket):
+async def handle_ping(websocket):
     await send_message(websocket, json.dumps({"type": "pong"}))
 
 
-async def handleMessage(websocket):
+async def handle_message(websocket):
     await register(websocket)
     try:
         async for message in websocket:
@@ -189,21 +196,21 @@ async def handleMessage(websocket):
 
             # {type: "state"}
             if messageType == "getState":
-                await handleStateRequest(websocket)
+                await handle_state_request(websocket)
             # {type: "updateState" data: { new state }}
             elif messageType == "updateState":
-                await handleStateUpdate(messageData)
+                await handle_state_update(messageData)
             # {type: "subscribeState", data: [state_keys] or "*"
             elif messageType == "subscribeState":
-                await handleStateSubscribe(websocket, messageData)
+                await handle_state_subscribe(websocket, messageData)
             # {type: "unsubscribeState", data: [state_keys] or "*"
             elif messageType == "unsubscribeState":
-                await handleStateUnsubscribe(websocket, messageData)
+                await handle_state_unsubscribe(websocket, messageData)
             # {type: "identity", data: "subsystem_name"}
             elif messageType == "identity":
-                await handleIdentity(websocket, messageData)
+                await handle_identity(websocket, messageData)
             elif messageType == "ping":
-                await handlePing(websocket)
+                await handle_ping(websocket)
             else:
                 log.error("received unsupported message: %s", messageType)
 
@@ -211,9 +218,11 @@ async def handleMessage(websocket):
                 log.info(f"getting next message for {websocket.remote_address[1]}")
 
     except Exception as e:
-        log.error(f"handleMessage from {websocket.remote_address[1]}: {e}")
-        traceback.print_exc()
-        raise e
+        # don't log the exception if it's just a disconnect "no close frame"
+        if "no close frame received" not in str(e):
+            log.error(f"handle_message from {websocket.remote_address[1]}: {e}")
+            traceback.print_exc()
+            raise e
 
     finally:
         await unregister(websocket)
@@ -230,7 +239,7 @@ async def main():
     log.info("Loading persisted state")
     hub_state.init_persisted_state()
     log.info(f"Starting server on port {constants.HUB_PORT}")
-    async with websockets.serve(handleMessage, port=constants.HUB_PORT):
+    async with websockets.serve(handle_message, port=constants.HUB_PORT):
         # log.info("Starting hub stats task")
         # await send_hub_stats_task()
         await persist_state_task()

@@ -54,9 +54,24 @@ async def initialize_arm_configs():
 async def load_arm_config(arm_config_json_file):
     with open(f"{c.ARM_CONFIGS_DIR}/{arm_config_json_file}") as f:
         global current_arm_config
-        current_arm_config = json.load(f)
-        current_arm_config["filename"] = arm_config_json_file
-        current_arm_config["updated_at"] = time.time()
+        loaded_arm_config = json.load(f)
+        current_arm_config = {
+            "filename": arm_config_json_file,
+            "updated_at": time.time(),
+            "description": loaded_arm_config["description"],
+            "arm_parts": [],
+        }
+
+        for jsonPartFile in loaded_arm_config["arm_parts"]:
+            log.info("jsonPartFile: " + jsonPartFile)
+            new_arm_part = {
+                "part_json_file": jsonPartFile,
+            }
+            with open(f"{c.ARM_PARTS_DIR}/{jsonPartFile}") as f:
+                loaded_part_file = json.load(f)
+                new_arm_part.update(loaded_part_file)
+            current_arm_config["arm_parts"].append(new_arm_part)
+
         log.info(f"loaded arm config: {current_arm_config}")
         with open(SAVED_CONFIG_FILE, "w") as f:
             f.write(arm_config_json_file)
@@ -100,21 +115,25 @@ async def consumer_task():
                 async for message in websocket:
                     data = json.loads(message)
                     message_data = data.get("data")
-                    try:
-                        if c.LOG_ALL_MESSAGES:
-                            log.info(f"received {message_data}")
-                        if "arm_config_selected" in message_data:
-                            arm_config_selected = message_data["arm_config_selected"]
-                            if arm_config_selected != current_arm_config["filename"]:
-                                log.info(
-                                    f"changing arm_config from {current_arm_config['filename']} to {arm_config_selected}"
-                                )
+                    if c.LOG_ALL_MESSAGES:
+                        log.info(f"received {message_data}")
+
+                    if "arm_config_selected" in message_data:
+                        arm_config_selected = message_data["arm_config_selected"]
+                        if arm_config_selected != current_arm_config["filename"]:
+                            log.info(
+                                f"changing arm_config from {current_arm_config['filename']} to {arm_config_selected}"
+                            )
+                            try:
                                 await load_arm_config(arm_config_selected)
                                 await send_arm_config(websocket)
 
-                    except:
-                        log.error(f"error loading arm config: {message_data}")
-                        traceback.print_exc()
+                            except:
+                                log.error(
+                                    f"error loading arm config: {message_data}, resetting to {current_arm_config['filename']}"
+                                )
+                                await send_selected_arm_config(websocket)
+                                traceback.print_exc()
 
         except:
             traceback.print_exc()
@@ -148,6 +167,7 @@ class FileChangeHandler(FileSystemEventHandler):
 event_handler = FileChangeHandler()
 observer = Observer()
 observer.schedule(event_handler, path=c.ARM_CONFIGS_DIR, recursive=True)
+observer.schedule(event_handler, path=c.ARM_PARTS_DIR, recursive=True)
 observer.start()
 
 

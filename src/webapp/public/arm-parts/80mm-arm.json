@@ -1,0 +1,14 @@
+{
+    "name": "arm-segment-2",
+    "file": "80mm-arm.stl",
+    "position": {
+        "x": 0,
+        "y": 0,
+        "z": 360
+    },
+    "rotationOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 90
+    }
+}

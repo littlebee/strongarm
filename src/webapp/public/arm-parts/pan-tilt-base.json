@@ -1,0 +1,15 @@
+{
+    "name": "pan-tilt-base",
+    "file": "pan-tilt-base.stl",
+    "fixed": true,
+    "position": {
+        "x": 0,
+        "y": 0,
+        "z": 130
+    },
+    "initialRotation": {
+        "x": 0,
+        "y": 0,
+        "z": 90
+    }
+}

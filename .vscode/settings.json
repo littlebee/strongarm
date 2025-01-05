@@ -4,6 +4,7 @@
         "hubstate",
         "lcars",
         "logfile",
+        "premodule",
         "servokit",
         "strongarm"
     ]

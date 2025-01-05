@@ -1,0 +1,20 @@
+{
+    "name": "arm-segment-3",
+    "file": "forearm.stl",
+    "position": {
+        "x": 0,
+        "y": 0,
+        "z": 270
+    },
+    "initialRotation": {
+        "x": 45,
+        "y": 0,
+        "z": 0
+    },
+    "rotationOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 50
+    },
+    "minAngle": 13
+}
