@@ -1,0 +1,14 @@
+{
+    "name": "pan-tilt-rotator",
+    "file": "pan-tilt-rotator.stl",
+    "position": {
+        "x": 2,
+        "y": 5,
+        "z": 39
+    },
+    "rotationOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 35
+    }
+}
