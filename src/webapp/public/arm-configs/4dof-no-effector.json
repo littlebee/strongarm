@@ -1,80 +1,10 @@
 {
     "description": "Bare bones 4dof arm",
     "arm_parts": [
-        {
-            "name": "base",
-            "file": "turntable-bottom.stl",
-            "position": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-            },
-            "initialRotation": {
-                "x": -90,
-                "y": 0,
-                "z": 0
-            },
-            "fixed": true
-        },
-        {
-            "name": "turntable",
-            "file": "turntable-top.stl",
-            "position": {
-                "x": 0,
-                "y": -27,
-                "z": 50
-            },
-            "invertRotation": true,
-            "rotationAxis": "z"
-
-        },
-        {
-            "name": "arm-segment-1",
-            "file": "140mm-arm.stl",
-            "position": {
-                "x": 0,
-                "y": 0,
-                "z": 150
-            },
-            "rotationOffset": {
-                "x": 0,
-                "y": 0,
-                "z": 120
-            }
-        },
-        {
-            "name": "arm-segment-2",
-            "file": "80mm-arm.stl",
-            "position": {
-                "x": 0,
-                "y": 0,
-                "z": 360
-            },
-            "rotationOffset": {
-                "x": 0,
-                "y": 0,
-                "z": 90
-            }
-        },
-        {
-            "name": "arm-segment-3",
-            "file": "forearm.stl",
-            "position": {
-                "x": 0,
-                "y": 0,
-                "z": 270
-            },
-            "initialRotation": {
-                "x": 45,
-                "y": 0,
-                "z": 0
-            },
-            "rotationOffset": {
-                "x": 0,
-                "y": 0,
-                "z": 50
-            },
-            "minAngle": 13
-        }
+        "./src/webapp/public/arm-parts/turntable-bottom.json",
+        "./src/webapp/public/arm-parts/turntable-top.json",
+        "./src/webapp/public/arm-parts/140mm-arm.json",
+        "./src/webapp/public/arm-parts/80mm-arm.json",
+        "./src/webapp/public/arm-parts/forearm.json"
     ]
 }
