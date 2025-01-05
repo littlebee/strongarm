@@ -206,18 +206,6 @@ async def hubstate_consumer_task():
 # asyncio.run(hubstate_consumer_task())
 
 
-def signal_term_handler(signal, frame):
-    global force_stop, connected_socket
-
-    log.info("got SIGTERM")
-    force_stop = True
-    if connected_socket:
-        asyncio.run(connected_socket.close())
-    sys.exit(0)
-
-
-signal.signal(signal.SIGTERM, signal_term_handler)
-
 try:
     asyncio.run(hubstate_consumer_task())
 except:

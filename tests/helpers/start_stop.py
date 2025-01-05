@@ -4,9 +4,13 @@ import time
 from typing import List
 
 import helpers.constants as tc
+import helpers.central_hub as hub
+
+premodule_state = None
 
 
 def start_services(service_list: List[str]):
+    global premodule_state
     """
     starts subsystems as a detached process using same start script used to start on the bot
 
@@ -23,12 +27,13 @@ def start_services(service_list: List[str]):
 
 def stop_services(service_list: List[str]):
     """
-    stops subsystems
+    stops subsystems and restores the central hub state to what it was before the tests started
 
     Args:
         service_list = the names of the subsystems to start.  Which should be the base file names of the
                 service main file in src/ directory.
     """
+
     for service_name in service_list:
         exit_code = os.system(f"./stop.sh src/{service_name}.py")
 

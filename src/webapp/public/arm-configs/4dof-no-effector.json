@@ -1,10 +1,10 @@
 {
     "description": "Bare bones 4dof arm",
     "arm_parts": [
-        "./src/webapp/public/arm-parts/turntable-bottom.json",
-        "./src/webapp/public/arm-parts/turntable-top.json",
-        "./src/webapp/public/arm-parts/140mm-arm.json",
-        "./src/webapp/public/arm-parts/80mm-arm.json",
-        "./src/webapp/public/arm-parts/forearm.json"
+        "turntable-bottom.json",
+        "turntable-top.json",
+        "140mm-arm.json",
+        "80mm-arm.json",
+        "forearm.json"
     ]
 }

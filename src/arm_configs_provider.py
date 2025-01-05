@@ -54,9 +54,24 @@ async def initialize_arm_configs():
 async def load_arm_config(arm_config_json_file):
     with open(f"{c.ARM_CONFIGS_DIR}/{arm_config_json_file}") as f:
         global current_arm_config
-        current_arm_config = json.load(f)
-        current_arm_config["filename"] = arm_config_json_file
-        current_arm_config["updated_at"] = time.time()
+        loaded_arm_config = json.load(f)
+        current_arm_config = {
+            "filename": arm_config_json_file,
+            "updated_at": time.time(),
+            "description": loaded_arm_config["description"],
+            "arm_parts": [],
+        }
+
+        for jsonPartFile in loaded_arm_config["arm_parts"]:
+            log.info("jsonPartFile: " + jsonPartFile)
+            new_arm_part = {
+                "part_json_file": jsonPartFile,
+            }
+            with open(f"{c.ARM_PARTS_DIR}/{jsonPartFile}") as f:
+                loaded_part_file = json.load(f)
+                new_arm_part.update(loaded_part_file)
+            current_arm_config["arm_parts"].append(new_arm_part)
+
         log.info(f"loaded arm config: {current_arm_config}")
         with open(SAVED_CONFIG_FILE, "w") as f:
             f.write(arm_config_json_file)
@@ -152,6 +167,7 @@ class FileChangeHandler(FileSystemEventHandler):
 event_handler = FileChangeHandler()
 observer = Observer()
 observer.schedule(event_handler, path=c.ARM_CONFIGS_DIR, recursive=True)
+observer.schedule(event_handler, path=c.ARM_PARTS_DIR, recursive=True)
 observer.start()
 
 
