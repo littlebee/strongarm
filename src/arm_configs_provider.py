@@ -100,21 +100,25 @@ async def consumer_task():
                 async for message in websocket:
                     data = json.loads(message)
                     message_data = data.get("data")
-                    try:
-                        if c.LOG_ALL_MESSAGES:
-                            log.info(f"received {message_data}")
-                        if "arm_config_selected" in message_data:
-                            arm_config_selected = message_data["arm_config_selected"]
-                            if arm_config_selected != current_arm_config["filename"]:
-                                log.info(
-                                    f"changing arm_config from {current_arm_config['filename']} to {arm_config_selected}"
-                                )
+                    if c.LOG_ALL_MESSAGES:
+                        log.info(f"received {message_data}")
+
+                    if "arm_config_selected" in message_data:
+                        arm_config_selected = message_data["arm_config_selected"]
+                        if arm_config_selected != current_arm_config["filename"]:
+                            log.info(
+                                f"changing arm_config from {current_arm_config['filename']} to {arm_config_selected}"
+                            )
+                            try:
                                 await load_arm_config(arm_config_selected)
                                 await send_arm_config(websocket)
 
-                    except:
-                        log.error(f"error loading arm config: {message_data}")
-                        traceback.print_exc()
+                            except:
+                                log.error(
+                                    f"error loading arm config: {message_data}, resetting to {current_arm_config['filename']}"
+                                )
+                                await send_selected_arm_config(websocket)
+                                traceback.print_exc()
 
         except:
             traceback.print_exc()
