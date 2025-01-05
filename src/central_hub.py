@@ -62,6 +62,7 @@ async def send_state_update_to_subscribers(message_data):
             "data": message_data,
         }
     )
+    sockets_to_close = set()
     for socket in subscribed_sockets:
         try:
             await send_message(socket, relay_message)
@@ -70,6 +71,12 @@ async def send_state_update_to_subscribers(message_data):
                 f"error sending message to subscriber {socket.remote_address[1]}: {e}"
             )
             traceback.print_exc()
+            sockets_to_close.add(socket)
+
+    for socket in sockets_to_close:
+        log.info(f"relay error: closing socket {socket.remote_address[1]}")
+        await unregister(socket)
+        socket.close()
 
 
 async def notify_state(websocket="all"):

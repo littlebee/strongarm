@@ -8,8 +8,10 @@
 
 """
 
-import json
 import asyncio
+import json
+import signal
+import sys
 import traceback
 import websockets
 
@@ -17,6 +19,7 @@ from typing import List
 
 from commons import constants as c, messages as m, log, servo, hub_state
 
+force_stop = False
 
 servos = []
 for i in range(c.SERVO_CHANNELS):
@@ -55,7 +58,8 @@ async def init_hubstate_angles(websocket):
 
 
 async def current_angles_provider_task(websocket):
-    while True:
+    global force_stop
+    while not force_stop:
         if websocket.closed:
             log.info("websocket closed, exiting current_angles_provider_task")
             return
@@ -113,7 +117,8 @@ async def handle_set_angles(websocket, message_data) -> bool:
 
 
 async def hubstate_consumer_task():
-    while True:
+    global connected_socket
+    while not force_stop:
         connected_socket = None
         provider_task = None
         try:
@@ -178,8 +183,12 @@ async def hubstate_consumer_task():
                 provider_task.cancel()
                 provider_task = None
 
-            log.info("Reconnecting in 5 seconds...")
-            await asyncio.sleep(5)
+            if force_stop:
+                log.info("Exiting hubstate_consumer_task")
+                return
+            else:
+                log.info("Reconnecting in 5 seconds...")
+                await asyncio.sleep(5)
 
 
 # # Another way to run the tasks instead of creating the provider task in the consumer task
@@ -196,4 +205,22 @@ async def hubstate_consumer_task():
 
 # asyncio.run(hubstate_consumer_task())
 
-asyncio.run(hubstate_consumer_task())
+
+def signal_term_handler(signal, frame):
+    global force_stop, connected_socket
+
+    log.info("got SIGTERM")
+    force_stop = True
+    if connected_socket:
+        asyncio.run(connected_socket.close())
+    sys.exit(0)
+
+
+signal.signal(signal.SIGTERM, signal_term_handler)
+
+try:
+    asyncio.run(hubstate_consumer_task())
+except:
+    # not sure why this is necessary, but without it the process throws an exception
+    # when it exits via the sigterm signal handler
+    pass
