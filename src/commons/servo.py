@@ -8,8 +8,19 @@ import traceback
 
 from commons import log, constants as c
 
-if c.STRONGARM_ENV != "production":
-    log.info("commons.Servo running in development mode.  Using mock servo libs")
+if c.STRONGARM_ENV == "production":
+    from board import SCL, SDA
+    import busio
+
+    # Import the PCA9685 module. Available in the bundle and here:
+    #   https://github.com/adafruit/Adafruit_CircuitPython_PCA9685
+    from adafruit_pca9685 import PCA9685
+    from adafruit_motor import servo as servo_af
+
+    i2c = busio.I2C(SCL, SDA)
+    pca = PCA9685(i2c)
+else:
+    log.info(f"commons.Servo running in {c.STRONGARM_ENV} mode.  Using mock servo libs")
 
     class pca:
         channels = [i for i in range(16)]
@@ -22,17 +33,6 @@ if c.STRONGARM_ENV != "production":
                 self.max_pulse = max_pulse
                 self.fraction = 0
 
-else:
-    from board import SCL, SDA
-    import busio
-
-    # Import the PCA9685 module. Available in the bundle and here:
-    #   https://github.com/adafruit/Adafruit_CircuitPython_PCA9685
-    from adafruit_pca9685 import PCA9685
-    from adafruit_motor import servo as servo_af
-
-    i2c = busio.I2C(SCL, SDA)
-    pca = PCA9685(i2c)
 
 # env var to turn on console debug output
 DEBUG_MOTORS = os.getenv("DEBUG_MOTORS") or False
@@ -64,7 +64,7 @@ class Servo:
     down the movement.  The thread can be paused and resumed.
     """
 
-    def __init__(self, motor_channel, motor_range=180, min_angle=0, max_angle=180):
+    def __init__(self, motor_channel, motor_range, min_angle, max_angle):
         self.thread = None  # background thread that steps motor to destination
         self.pause_event = threading.Event()
         self.stopped_event = threading.Event()
@@ -72,14 +72,17 @@ class Servo:
         self._step_delay = DEFAULT_STEP_DELAY
 
         self.motor_channel = motor_channel
-        self.min_angle = min_angle
-        self.max_angle = max_angle
-        self.motor_range = motor_range
+        self.motor_range = motor_range or 180
+        self.min_angle = min_angle or 0
+        self.max_angle = max_angle or self.motor_range
         self.destination_angle = min_angle + ((max_angle - min_angle) / 2)
 
         self.servo = servo_af.Servo(
             pca.channels[motor_channel], min_pulse=500, max_pulse=2500
         )
+        # we need to initialize the servo to the middle of the range
+        # to know where it actually is
+        self.servo.fraction = self.destination_angle / self.motor_range
 
         self.thread = threading.Thread(target=self._thread)
         self.thread.start()

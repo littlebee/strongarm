@@ -3,9 +3,14 @@ import time
 from typing import Dict, Any, List
 from logging import getLogger
 
+from commons import constants as c
+
 log = getLogger(__name__)
 
 PERSISTED_STATE_FILE = "./persisted_state.json"
+TEST_PERSISTED_STATE_INPUT_FILE = "./tests/persisted_state.json"
+TEST_PERSISTED_STATE_OUTPUT_FILE = "./tests/persisted_state_out.json"
+
 
 state: Dict[str, Any] = {
     # provided by central_hub/
@@ -44,9 +49,15 @@ persisted_state_keys: List[str] = [
 
 # This should only be called by central_hub
 def init_persisted_state() -> None:
-    # if persisted state file exists, load it
+    file = PERSISTED_STATE_FILE
+    if c.STRONGARM_ENV == "test":
+        log.info(
+            f"Running in test mode, using {TEST_PERSISTED_STATE_INPUT_FILE} persisted state file"
+        )
+        file = TEST_PERSISTED_STATE_INPUT_FILE
+
     try:
-        with open(PERSISTED_STATE_FILE, "r") as f:
+        with open(file, "r") as f:
             persisted_state = json.load(f)
             for key in persisted_state_keys:
                 if key in persisted_state:
@@ -59,13 +70,21 @@ def init_persisted_state() -> None:
     log.info(f"initial state: {state}")
 
 
+# This should only be called by central_hub
 def persist_state() -> None:
     """Persist specified state keys to file."""
+    file = PERSISTED_STATE_FILE
+    if c.STRONGARM_ENV == "test":
+        log.info(
+            f"Running in test mode, using {TEST_PERSISTED_STATE_OUTPUT_FILE} file to persist state"
+        )
+        file = TEST_PERSISTED_STATE_INPUT_FILE
+
     try:
         persisted_state = {
             key: state[key] for key in persisted_state_keys if key in state
         }
-        with open(PERSISTED_STATE_FILE, "w") as f:
+        with open(file, "w") as f:
             json.dump(persisted_state, f, indent=4)
     except (IOError, json.JSONDecodeError) as e:
         log.error(f"Failed to persist state: {e}")

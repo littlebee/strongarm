@@ -4,7 +4,6 @@ import time
 from typing import List
 
 import helpers.constants as tc
-import helpers.central_hub as hub
 
 premodule_state = None
 
@@ -19,7 +18,7 @@ def start_services(service_list: List[str]):
                 service main file in src/ directory.
     """
     for service_name in service_list:
-        cmd = f"LOG_ALL_MESSAGES=1 HUB_PORT={tc.CENTRAL_HUB_TEST_PORT} ./start.sh src/{service_name}.py"
+        cmd = f"STRONGARM_ENV=test LOG_ALL_MESSAGES=1 HUB_PORT={tc.CENTRAL_HUB_TEST_PORT} ./start.sh src/{service_name}.py"
         exit_code = os.system(cmd)
         assert exit_code == 0
         time.sleep(1)
@@ -38,6 +37,10 @@ def stop_services(service_list: List[str]):
         exit_code = os.system(f"./stop.sh src/{service_name}.py")
 
         # note that this only shows up when a test module fails
+        # I contemplated adding a print statement here to instruct the tester to
+        # `cat logs/...`, but because each test module effectively overwrites the
+        # log of the previous test module and because the logs are printed at
+        # the end of the test module, this preserves the logs of the failing test
         print(f"\n {service_name} subsystem logs")
         print("===================================================================")
         os.system(f"cat logs/{service_name}.py.log")

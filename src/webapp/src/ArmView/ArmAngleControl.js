@@ -26,7 +26,7 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
             const rect = svgRef.current.getBoundingClientRect();
             const x = clientX - rect.left;
             const y = clientY - rect.top;
-            const angle = Math.atan2(y - 100, x - 100) * (motorRange / Math.PI);
+            const angle = Math.atan2(y - 100, x - 100) * (360 / Math.PI);
             onSetAngle(angle * -1);
 
             console.log("Mouse move", { x, y, angle });
