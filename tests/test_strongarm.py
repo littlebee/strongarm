@@ -37,7 +37,10 @@ class TestStrongarm:
 
     def test_clamped_angles_change(self):
         test_angles = [15, 55, 400, 115, 95, 5]
-        expected_clamped_angles = [15, 55, 180, 115, 95, 5]
+        # these are based on current_arm_config being 4dof-iphone.json
+        # and its respective part files. 240 is the max for the
+        # 3rd movable part
+        expected_clamped_angles = [15, 55, 240, 115, 95, 5]
         ws = hub.connect()
         hub.send_subscribe(ws, ["set_angles", "current_angles"])
         hub.send(ws, {"type": "getState"})

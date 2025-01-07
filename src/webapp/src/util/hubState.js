@@ -30,8 +30,6 @@ export const DEFAULT_HUB_STATE = {
     set_angles: [],
     // actual angles last reported by servos
     current_angles: [],
-    // centralized config
-    config: { min_servo_angle: 0, max_servo_angle: 180 },
 
     // array of json file names provided to central hub
     // by arms_config_provider
