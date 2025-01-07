@@ -7,6 +7,10 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
     const [grabberHovered, setGrabberHovered] = useState(false);
     const [changingAngle, setChangingAngle] = useState(null);
     const svgRef = useRef(null);
+    const motorRange = part.motorRange || 180;
+    const minAngle = part.minAngle || 0;
+    const maxAngle = part.maxAngle || motorRange;
+    const midAngle = (maxAngle + minAngle) / 2;
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -22,8 +26,10 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
             const rect = svgRef.current.getBoundingClientRect();
             const x = clientX - rect.left;
             const y = clientY - rect.top;
-            const angle = Math.atan2(y - 100, x - 100) * (180 / Math.PI);
+            const angle = Math.atan2(y - 100, x - 100) * (motorRange / Math.PI);
             onSetAngle(angle * -1);
+
+            console.log("Mouse move", { x, y, angle });
         };
 
         const handleMouseUp = () => {
@@ -41,7 +47,7 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
             document.removeEventListener("touchmove", handleMouseMove);
             document.removeEventListener("touchend", handleMouseUp);
         };
-    }, [grabberSelected, onSetAngle]);
+    }, [grabberSelected, onSetAngle, motorRange]);
 
     const handleGrabberMouseDown = useCallback(() => {
         setGrabberSelected(true);
@@ -71,7 +77,7 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
     });
 
     const translateAngle = (angle) => {
-        return 180 - angle;
+        return 90 + midAngle - angle;
     };
 
     return (
@@ -85,8 +91,8 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                     <div className={st.angleInputContainer}>
                         <input
                             type="number"
-                            min={part.minAngle || 0}
-                            max={part.maxAngle || 180}
+                            min={minAngle}
+                            max={maxAngle}
                             className={st.angleInput}
                             value={changingAngle || setAngle?.toFixed(0) || 0}
                             onChange={handleAngleInputChange}
@@ -97,18 +103,18 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                     </div>
                 </div>
             </div>
-            <svg width="300" height="100" viewBox="0 0 200 100" ref={svgRef}>
+            <svg width="200" height="100" viewBox="0 0 200 200" ref={svgRef}>
                 <circle
                     cx="100"
                     cy="100"
-                    r={80}
+                    r={70}
                     fill="none"
                     stroke="#c777"
                     strokeWidth="10"
                 />
                 <rect
                     className={st.grabber}
-                    x="0"
+                    x="10"
                     y="90"
                     height="20"
                     width="50"
@@ -133,35 +139,28 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                         currentAngle || 0
                     )} 100 100)`}
                 />
-                {part.minAngle && (
-                    <line
-                        x1="0"
-                        y1="100"
-                        x2="100"
-                        y2="100"
-                        fill="none"
-                        stroke="#770000"
-                        strokeWidth="2"
-                        strokeDasharray="5"
-                        transform={`rotate(${translateAngle(
-                            part.minAngle
-                        )} 100 100)`}
-                    />
-                )}
-                {part.maxAngle && (
-                    <line
-                        x1="25"
-                        y1="100"
-                        x2="100"
-                        y2="100"
-                        fill="none"
-                        stroke="#770000"
-                        strokeWidth="4"
-                        transform={`rotate(${translateAngle(
-                            part.maxAngle
-                        )} 100 100)`}
-                    />
-                )}
+                <line
+                    x1="0"
+                    y1="100"
+                    x2="100"
+                    y2="100"
+                    fill="none"
+                    stroke="#770000"
+                    strokeWidth="4"
+                    strokeDasharray="5"
+                    transform={`rotate(${translateAngle(minAngle)} 100 100)`}
+                />
+                <line
+                    x1="25"
+                    y1="100"
+                    x2="100"
+                    y2="100"
+                    fill="none"
+                    stroke="#770000"
+                    strokeWidth="4"
+                    strokeDasharray="5"
+                    transform={`rotate(${translateAngle(maxAngle)} 100 100)`}
+                />
             </svg>
         </div>
     );

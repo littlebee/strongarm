@@ -39,3 +39,8 @@ LOG_ALL_MESSAGES = env_bool("LOG_ALL_MESSAGES", False)
 
 ARM_CONFIGS_DIR = env_string("ARM_CONFIGS_DIR", "./src/webapp/public/arm-configs")
 ARM_PARTS_DIR = env_string("ARM_PARTS_DIR", "./src/webapp/public/arm-parts")
+
+# This is used to stub out the motor controller for testing and local (mac/windows) development
+#   This is set to True in env vars on the raspberry pi by the default rc.local script
+#
+STRONGARM_ENV = env_string("STRONGARM_ENV", "development")

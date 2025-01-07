@@ -10,14 +10,13 @@
 
 import asyncio
 import json
-import signal
-import sys
 import traceback
 import websockets
 
 from typing import List
 
 from commons import constants as c, messages as m, log, servo, hub_state
+from commons.arm_config_utils import get_movable_parts
 
 force_stop = False
 
@@ -57,6 +56,21 @@ async def init_hubstate_angles(websocket):
     )
 
 
+def init_servos(hub_state):
+    movable_parts = get_movable_parts(hub_state)
+    for i in range(c.SERVO_CHANNELS):
+        if i >= len(movable_parts):
+            break
+        servos.append(
+            servo.Servo(
+                i,
+                movable_parts[i]["motor_range"],
+                movable_parts[i]["min_angle"],
+                movable_parts[i]["max_angle"],
+            )
+        )
+
+
 async def current_angles_provider_task(websocket):
     global force_stop
     while not force_stop:
@@ -71,14 +85,15 @@ async def current_angles_provider_task(websocket):
 def clamp_angles(new_angles: List[float]) -> List[float]:
     """clamp angles to min/max values and update hub_state set_angles if clamped"""
     last_set_angles = hub_state.state.get("set_angles", [])
-    arm_parts = hub_state.state.get("arm_config", {}).get("arm_parts", [])
-    movable_parts = [part for part in arm_parts if not part.get("fixed")]
+    movable_parts = get_movable_parts(hub_state)
     log.info(f"clamp_angles movable_parts: {movable_parts}")
     clamped_angles = []
     for i in range(len(movable_parts)):
         part = movable_parts[i]
+        part_motor_range = part.get("motorRange", 180)
         part_min = part.get("minAngle", 0)
-        part_max = part.get("maxAngle", 180)
+        part_max = part.get("maxAngle", part_motor_range)
+        part_mid = part_min + (part_max - part_min) / 2
 
         if i >= len(new_angles):
             if i < len(last_set_angles):
@@ -87,8 +102,12 @@ def clamp_angles(new_angles: List[float]) -> List[float]:
                 clamped_angles.append(part_min + (part_max - part_min) / 2)
             continue
         if new_angles[i] < 0:
-            # this case is kinda specific to how ArmAngleControl is implemented
-            clamped_angles.append(part_max if new_angles[i] < -(180 - 45) else part_min)
+            # This case is kinda specific to how ArmAngleControl is implemented.
+            # When you go around below the maotorRange it will send negative angle
+            # and this clamps to  0 or max
+            clamped_angles.append(
+                part_max if new_angles[i] < -(part_max - part_mid) else part_min
+            )
         else:
             clamped_angles.append(max(part_min, min(part_max, new_angles[i])))
 
@@ -130,6 +149,9 @@ async def hubstate_consumer_task():
                 await m.send_subscribe(websocket, ["set_angles", "arm_config"])
                 await m.send_get_state(websocket)
                 await init_hubstate_angles(websocket)
+
+                log.info("initializing servos")
+                init_servos(hub_state)
 
                 log.info("connected to hub. starting current_angles_provider_task")
                 provider_task = asyncio.create_task(

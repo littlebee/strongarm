@@ -6,18 +6,33 @@ import time
 import threading
 import traceback
 
-import commons.log as log
+from commons import log, constants as c
 
-# TODO - I worry that this will frustrate the experience of running
-#  the system on a Raspberry Pi that has not had the adafruit_servokit
-#  library installed.  It will silently just not work.
-try:
-    from adafruit_servokit import ServoKit  # type: ignore
-except:
-    log.error(
-        "Failed to import adafruit_servokit.  Is it installed?  Running with mock_servokit"
-    )
-    from commons.mock_servokit import ServoKit
+if c.STRONGARM_ENV != "production":
+    log.info("commons.Servo running in development mode.  Using mock servo libs")
+
+    class pca:
+        channels = [i for i in range(16)]
+
+    class servo_af:
+        class Servo:
+            def __init__(self, channel, min_pulse=500, max_pulse=2500):
+                self.channel = channel
+                self.min_pulse = min_pulse
+                self.max_pulse = max_pulse
+                self.fraction = 0
+
+else:
+    from board import SCL, SDA
+    import busio
+
+    # Import the PCA9685 module. Available in the bundle and here:
+    #   https://github.com/adafruit/Adafruit_CircuitPython_PCA9685
+    from adafruit_pca9685 import PCA9685
+    from adafruit_motor import servo as servo_af
+
+    i2c = busio.I2C(SCL, SDA)
+    pca = PCA9685(i2c)
 
 # env var to turn on console debug output
 DEBUG_MOTORS = os.getenv("DEBUG_MOTORS") or False
@@ -29,8 +44,6 @@ DEFAULT_STEP_DELAY = 0.0001
 
 # the precision of the servo motors in degrees
 SERVO_PRECISION = 0.5
-
-servo_kit = ServoKit(channels=16)
 
 
 def limit_angle(angle, min_angle, max_angle):
@@ -51,7 +64,7 @@ class Servo:
     down the movement.  The thread can be paused and resumed.
     """
 
-    def __init__(self, motor_channel, min_angle=0, max_angle=180):
+    def __init__(self, motor_channel, motor_range=180, min_angle=0, max_angle=180):
         self.thread = None  # background thread that steps motor to destination
         self.pause_event = threading.Event()
         self.stopped_event = threading.Event()
@@ -61,14 +74,20 @@ class Servo:
         self.motor_channel = motor_channel
         self.min_angle = min_angle
         self.max_angle = max_angle
+        self.motor_range = motor_range
         self.destination_angle = min_angle + ((max_angle - min_angle) / 2)
+
+        self.servo = servo_af.Servo(
+            pca.channels[motor_channel], min_pulse=500, max_pulse=2500
+        )
+
         self.thread = threading.Thread(target=self._thread)
         self.thread.start()
 
     @property
     def current_angle(self):
         try:
-            return servo_kit.servo[self.motor_channel].angle
+            return self.servo.fraction * self.motor_range
         except OSError as error:
             # Was getting intermittent exception from adafruit servo kit
             # originating from i2c_bus.read_i2c_block_data()
@@ -129,7 +148,7 @@ class Servo:
             log.info(
                 f"initializing motor {self.motor_channel} to {self.destination_angle}deg"
             )
-        servo_kit.servo[self.motor_channel].angle = self.destination_angle
+        self.servo.fraction = self.destination_angle / self.motor_range
         time.sleep(0.5)
         # need to establish initial position of motor
 
@@ -167,13 +186,13 @@ class Servo:
 
             if would_overshoot:
                 # get the servo as close to the destination as possible
-                servo_kit.servo[self.motor_channel].angle = self.destination_angle
+                self.servo.fraction = self.destination_angle / self.motor_range
                 # and then stop the movement loop
                 return False
 
             new_angle = self.current_angle + (STEP_DEGREES * direction)
 
-            servo_kit.servo[self.motor_channel].angle = new_angle
+            self.servo.fraction = new_angle / self.motor_range
             time.sleep(self._step_delay)
 
             return True

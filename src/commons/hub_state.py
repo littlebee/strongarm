@@ -14,8 +14,6 @@ state: Dict[str, Any] = {
     "set_angles": [],
     # actual angles last reported by servos
     "current_angles": [],
-    # centralized config
-    "config": {"min_servo_angle": 0, "max_servo_angle": 180},
     # which subsystems are online and have indentified themselves
     "subsystem_stats": {},
     # array of json file names provided to central hub
