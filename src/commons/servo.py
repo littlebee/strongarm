@@ -19,6 +19,7 @@ if c.STRONGARM_ENV == "production":
 
     i2c = busio.I2C(SCL, SDA)
     pca = PCA9685(i2c)
+    pca.frequency = 50
 else:
     log.info(f"commons.Servo running in {c.STRONGARM_ENV} mode.  Using mock servo libs")
 
@@ -75,13 +76,17 @@ class Servo:
         self.motor_range = motor_range or 180
         self.min_angle = min_angle or 0
         self.max_angle = max_angle or self.motor_range
-        self.destination_angle = min_angle + ((max_angle - min_angle) / 2)
+        self.mid_angle = min_angle + ((max_angle - min_angle) / 2)
+        self.destination_angle = self.mid_angle
 
         self.servo = servo_af.Servo(
             pca.channels[motor_channel], min_pulse=500, max_pulse=2500
         )
         # we need to initialize the servo to the middle of the range
         # to know where it actually is
+        log.info(
+            f"initializing servo {self.motor_channel} to mid range {self.mid_angle} deg of {self.motor_range} deg motor range"
+        )
         self.servo.fraction = self.destination_angle / self.motor_range
 
         self.thread = threading.Thread(target=self._thread)

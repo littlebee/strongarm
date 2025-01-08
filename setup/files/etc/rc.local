@@ -17,10 +17,14 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-export -p STRONGARM_ENV="production"
+export STRONGARM_ENV=production
+
+cd /home/bee/strongarm
+# if the onboard computer is rebooted, we need to remove the pid files
+# or the start.sh script will not start the services
+rm *.pid
 
 # start web services
-cd /home/bee/strongarm
 ./start.sh > /home/bee/strongarm/logs/rclocal.log
 
 
