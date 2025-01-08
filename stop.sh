@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# # stop on error - let other subs exit if any sub fails to exit
-# set -e
+# DON'T STOP ON ERRORS - handle them herein
+## set -e
 
 # user=`echo $USER`
 # if [ "$user" != "root" ]; then
@@ -39,6 +39,10 @@ do
     echo "stopping $sub_system at $(date)" >> "$logfile"
 
     pid_file="./$base_name.pid"
+    if [ "$STRONGARM_ENV" == "test" ]; then
+        echo "stopping test mode process..."
+        pid_file="./test_$base_name.pid"
+    fi
 
     if [ -f "$pid_file" ]; then
         kill -15 `cat $pid_file`
@@ -46,7 +50,8 @@ do
         if [ $? -eq 0 ]; then
             rm -f $pid_file
         else
-            echo "kill failed for $sub_system.  Maybe retry using sudo ./stop.sh"
+            echo "kill failed for $sub_system."
+            echo "Maybe retry using sudo ./stop.sh and if that fails, manually delete the .pid file"
         fi
     else
         echo "$pid_file does not exist. skipping"
