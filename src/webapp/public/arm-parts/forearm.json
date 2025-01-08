@@ -11,5 +11,8 @@
         "y": 0,
         "z": 50
     },
-    "minAngle": 13
+    "motorRange": 270,
+    "minAngle": 30,
+    "maxAngle": 240
+
 }

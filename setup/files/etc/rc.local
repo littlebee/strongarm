@@ -17,6 +17,8 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
+export -p STRONGARM_ENV="production"
+
 # start web services
 cd /home/bee/strongarm
 ./start.sh > /home/bee/strongarm/logs/rclocal.log

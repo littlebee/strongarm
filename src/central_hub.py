@@ -230,6 +230,7 @@ async def handle_message(websocket):
 
 
 async def persist_state_task():
+
     while True:
         hub_state.persist_state()
         await asyncio.sleep(1)

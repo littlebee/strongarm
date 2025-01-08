@@ -84,14 +84,22 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
 
             movables.forEach((part, index) => {
                 if (part && part.threeDObject) {
-                    const axis = part.part.rotationAxis || "x";
-                    const initial = part.part.initialRotation?.[axis] || 0;
-
                     if (index < currentAngles.length) {
-                        let newAngle = 90 - currentAngles[index] + initial;
+                        const axis = part.part.rotationAxis || "x";
+                        const initial = part.part.initialRotation?.[axis] || 0;
+                        const minAngle = part.part.minAngle || 0;
+                        const maxAngle =
+                            part.part.maxAngle || part.part.motor_range || 270;
+                        const midAngle = minAngle + (maxAngle - minAngle) / 2;
+                        let newAngle =
+                            midAngle - currentAngles[index] + initial;
                         if (part.part.invertRotation) {
                             newAngle *= -1;
                         }
+                        console.log("Arm3d::animate()", {
+                            part,
+                            newAngle,
+                        });
                         part.threeDObject.rotation[axis] = degToRad(newAngle);
                     }
                 }
