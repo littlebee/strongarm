@@ -151,22 +151,21 @@ async def handle_message(websocket, data):
     message_type = data.get("type")
     message_data = data.get("data", {})
 
-    match message_type:
-        case m.MessageType.STATE_UPDATE.value:
-            if not await handle_set_angles(
-                websocket, message_data
-            ) and not await handle_arm_config_change(websocket, message_data):
-                hub_state.update_state_from_message_data(message_data)
-
-        case m.MessageType.STATE.value:
+    if message_type == m.MessageType.STATE_UPDATE.value:
+        if not await handle_set_angles(
+            websocket, message_data
+        ) and not await handle_arm_config_change(websocket, message_data):
             hub_state.update_state_from_message_data(message_data)
-            if not has_received_state:
-                has_received_state = True
-                await init_with_hubstate(websocket)
 
-        case _:
-            if c.LOG_ALL_MESSAGES:
-                log.info(f"ignoring message: {message_type=} {message_data=}")
+    elif message_type == m.MessageType.STATE.value:
+        hub_state.update_state_from_message_data(message_data)
+        if not has_received_state:
+            has_received_state = True
+            await init_with_hubstate(websocket)
+
+    else:
+        if c.LOG_ALL_MESSAGES:
+            log.info(f"ignoring message: {message_type=} {message_data=}")
 
 
 async def cleanup():

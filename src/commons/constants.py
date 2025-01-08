@@ -1,5 +1,9 @@
 import os
 
+print("Environment variables:")
+for name, value in os.environ.items():
+    print("{0}: {1}".format(name, value))
+
 
 def env_string(name, default):
     env_val = os.getenv(name) or str(default)
