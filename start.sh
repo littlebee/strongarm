@@ -62,16 +62,29 @@ do
 
     base_name=$(basename $sub_system)
     logfile="./logs/$base_name.log"
+    pid_file="./$base_name.pid"
+
+    if [ "$STRONGARM_ENV" == "test" ]; then
+        echo "running $sub_system in test mode"
+        logfile="./logs/test_$base_name.log"
+        pid_file="./test_$base_name.pid"
+    fi
 
     if [ -f "$logfile" ]; then
         mv -f "$logfile" "$logfile".1
+    fi
+
+    if [ -f "./$pid_file" ]; then
+        echo "cowardly refusing to overwrite existing pid file for $sub_system ($pid_file)"
+        echo "please stop the service first"
+        continue
     fi
 
     echo "starting $sub_system at $(date)" >> "$logfile"
 
     python3 $sub_system > $logfile 2>&1 &
 
-    echo $! > ./$base_name.pid
+    echo $! > ./$pid_file
 
     if [[ $sleep -gt 0 ]]; then
         echo "sleeping for $sleep seconds"
