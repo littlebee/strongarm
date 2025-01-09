@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef, use } from "react";
 
+import { findAngle } from "../util/angle_utils";
 import st from "./ArmAngleControl.module.css";
+
+const CIRCLE_CENTER = { x: 100, y: 100 };
 
 export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
     const [grabberSelected, setGrabberSelected] = useState(false);
@@ -24,12 +27,10 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
             const clientX = e.clientX || e.touches[0].clientX;
             const clientY = e.clientY || e.touches[0].clientY;
             const rect = svgRef.current.getBoundingClientRect();
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-            const angle = Math.atan2(y - 100, x - 100) * (360 / Math.PI);
+            const centerX = rect.left + CIRCLE_CENTER.x / 2;
+            const centerY = rect.top + CIRCLE_CENTER.y;
+            const angle = findAngle(centerX, centerY, clientX, clientY);
             onSetAngle(angle * -1);
-
-            console.log("Mouse move", { x, y, angle });
         };
 
         const handleMouseUp = () => {
@@ -80,6 +81,23 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
         return 90 + midAngle - angle;
     };
 
+    const grabberHashMarks = [];
+    for (let i = 0; i < 3; i++) {
+        const x = 10 + i * 10;
+        grabberHashMarks.push(
+            <line
+                key={i}
+                x1={x}
+                y1="95"
+                x2={x}
+                y2="105"
+                fill="none"
+                stroke="#000"
+                strokeWidth="1"
+            />
+        );
+    }
+
     return (
         <div className={st.container}>
             <div className={st.currentAngle}>
@@ -103,63 +121,75 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
                     </div>
                 </div>
             </div>
-            <svg width="200" height="100" viewBox="0 0 200 200" ref={svgRef}>
+            <svg width="200" height="100" viewBox="0 0 200 180" ref={svgRef}>
                 <circle
-                    cx="100"
-                    cy="100"
-                    r={70}
+                    cx={CIRCLE_CENTER.x}
+                    cy={CIRCLE_CENTER.y}
+                    r={90}
                     fill="none"
                     stroke="#c777"
                     strokeWidth="10"
                 />
-                <rect
-                    className={st.grabber}
-                    x="10"
-                    y="90"
-                    height="20"
-                    width="50"
-                    rx="10"
-                    fill="#9d6" // from lcars.css
-                    transform={`rotate(${translateAngle(setAngle)} 100 100)`}
-                    opacity={grabberSelected ? 1 : grabberHovered ? 0.8 : 0.7}
-                    onMouseDown={handleGrabberMouseDown}
-                    onTouchStart={handleGrabberMouseDown}
-                    onMouseEnter={() => setGrabberHovered(true)}
-                    onMouseLeave={() => setGrabberHovered(false)}
-                />
+                <g
+                    transform={`rotate(${translateAngle(setAngle)} ${
+                        CIRCLE_CENTER.x
+                    } ${CIRCLE_CENTER.y})`}
+                >
+                    <rect
+                        className={st.grabber}
+                        x="-10"
+                        y="88"
+                        height="25"
+                        width="60"
+                        rx="10"
+                        fill="#9d6" // from lcars.css
+                        opacity={
+                            grabberSelected ? 1 : grabberHovered ? 0.8 : 0.7
+                        }
+                        onMouseDown={handleGrabberMouseDown}
+                        onTouchStart={handleGrabberMouseDown}
+                        onMouseEnter={() => setGrabberHovered(true)}
+                        onMouseLeave={() => setGrabberHovered(false)}
+                    />
+                    {grabberHashMarks}
+                </g>
                 <line
-                    x1="55"
-                    y1="100"
-                    x2="100"
-                    y2="100"
+                    x1="35"
+                    y1={CIRCLE_CENTER.x}
+                    x2={CIRCLE_CENTER.x}
+                    y2={CIRCLE_CENTER.y}
                     fill="none"
                     stroke="#ffff00"
                     strokeWidth="1"
-                    transform={`rotate(${translateAngle(
-                        currentAngle || 0
-                    )} 100 100)`}
+                    transform={`rotate(${translateAngle(currentAngle || 0)} ${
+                        CIRCLE_CENTER.x
+                    } ${CIRCLE_CENTER.y})`}
                 />
                 <line
                     x1="0"
-                    y1="100"
-                    x2="100"
-                    y2="100"
+                    y1={CIRCLE_CENTER.x}
+                    x2={CIRCLE_CENTER.x}
+                    y2={CIRCLE_CENTER.y}
                     fill="none"
                     stroke="#770000"
                     strokeWidth="4"
                     strokeDasharray="5"
-                    transform={`rotate(${translateAngle(minAngle)} 100 100)`}
+                    transform={`rotate(${translateAngle(minAngle)} ${
+                        CIRCLE_CENTER.x
+                    } ${CIRCLE_CENTER.y})`}
                 />
                 <line
                     x1="25"
-                    y1="100"
-                    x2="100"
-                    y2="100"
+                    y1={CIRCLE_CENTER.x}
+                    x2={CIRCLE_CENTER.x}
+                    y2={CIRCLE_CENTER.y}
                     fill="none"
                     stroke="#770000"
                     strokeWidth="4"
                     strokeDasharray="5"
-                    transform={`rotate(${translateAngle(maxAngle)} 100 100)`}
+                    transform={`rotate(${translateAngle(maxAngle)} ${
+                        CIRCLE_CENTER.x
+                    } ${CIRCLE_CENTER.y})`}
                 />
             </svg>
         </div>

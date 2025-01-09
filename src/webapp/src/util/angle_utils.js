@@ -8,3 +8,10 @@ export function anglesCloseEnough(anglesA, anglesB) {
     }
     return true;
 }
+
+// given 2 points in 2d space find degrees from point a to point b
+export function findAngle(x1, y1, x2, y2) {
+    const angleDeg = (Math.atan2(y2 - y1, x2 - x1) * 360) / Math.PI;
+    console.log({ x1, y1, x2, y2, angleDeg });
+    return angleDeg;
+}

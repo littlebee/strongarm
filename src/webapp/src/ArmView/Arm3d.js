@@ -96,10 +96,6 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
                         if (part.part.invertRotation) {
                             newAngle *= -1;
                         }
-                        console.log("Arm3d::animate()", {
-                            part,
-                            newAngle,
-                        });
                         part.threeDObject.rotation[axis] = degToRad(newAngle);
                     }
                 }
