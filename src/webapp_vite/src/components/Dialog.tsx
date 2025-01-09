@@ -1,25 +1,31 @@
-// Dialog to save the current_angles to the saved_positions hubstate
-//
-import React, { useCallback, useState, useRef, useEffect, use } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { classnames as cx } from "../util/classNames";
 import st from "./Dialog.module.css";
 
-export function Dialog({ title, isOpen, onClose, buttons, children }) {
-    const dialogRef = useRef();
+interface DialogProps {
+    title: string;
+    isOpen: boolean;
+    onClose: () => void;
+    buttons: React.ReactNode;
+    children: React.ReactNode;
+}
+
+export function Dialog({ title, isOpen, onClose, buttons, children }: DialogProps) {
+    const dialogRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (isOpen) {
             console.log("focusRef.current.focus()");
             dialogRef.current
-                .querySelector(":first-child input,button,textarea")
+                ?.querySelector(":first-child input,button,textarea")
                 ?.focus();
         }
     }, [isOpen, dialogRef]);
 
     useEffect(() => {
-        const handleKeyDown = (e) => {
+        const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
                 e.preventDefault();
                 e.stopPropagation();
@@ -31,13 +37,16 @@ export function Dialog({ title, isOpen, onClose, buttons, children }) {
         } else {
             document.removeEventListener("keydown", handleKeyDown);
         }
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
     }, [isOpen, onClose]);
 
-    const handleBackdropClick = useCallback((e) => {
+    const handleBackdropClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
             onClose();
         }
-    });
+    }, [onClose]);
 
     return (
         <div

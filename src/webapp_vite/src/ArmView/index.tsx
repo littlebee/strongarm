@@ -5,9 +5,24 @@ import Arm3D from "./Arm3d";
 import st from "./index.module.css";
 import { ArmAngleControls } from "./ArmAngleControls";
 
+interface HubState {
+    arm_config: {
+        arm_parts: Array<{
+            fixed: boolean;
+        }>;
+        [key: string]: any;
+    };
+    current_angles: number[];
+    set_angles: number[];
+}
+
+interface ArmViewProps {
+    hubState: HubState;
+}
+
 const lastCurrentAngles = null;
 
-export function ArmView({ hubState }) {
+export function ArmView({ hubState }: ArmViewProps) {
     // console.log("ArmView", { hubState, lastCurrentAngles });
 
     const parts = useMemo(

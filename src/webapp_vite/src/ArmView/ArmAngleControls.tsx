@@ -5,13 +5,19 @@ import { ArmControl } from "./ArmAngleControl";
 
 import st from "./ArmAngleControls.module.css";
 
-export function ArmAngleControls({ parts, currentAngles, setAngles }) {
+interface ArmAngleControlsProps {
+    parts: any[];
+    currentAngles: number[];
+    setAngles: number[];
+}
+
+export function ArmAngleControls({ parts, currentAngles, setAngles }: ArmAngleControlsProps) {
     const handleOnSetAngle = useCallback((angleIndex, angle) => {
         console.log("setting angle", { angleIndex, angle });
         const newAngles = [...setAngles];
         newAngles[angleIndex] = angle;
         sendSetAngles(newAngles);
-    });
+    }, [setAngles]);
 
     const controls = useMemo(() => {
         if (!parts?.length) return null;
@@ -29,7 +35,7 @@ export function ArmAngleControls({ parts, currentAngles, setAngles }) {
             );
         }
         return cOut;
-    });
+    }, [parts, currentAngles, setAngles, handleOnSetAngle]);
 
     return (
         <div>

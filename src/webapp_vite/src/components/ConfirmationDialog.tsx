@@ -2,13 +2,21 @@ import { Dialog } from "./Dialog";
 
 import st from "./ConfirmationDialog.module.css";
 
+interface ConfirmationDialogProps {
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+}
+
 export function ConfirmationDialog({
     isOpen,
     title,
     message,
     onConfirm,
     onCancel,
-}) {
+}: ConfirmationDialogProps) {
     const buttons = (
         <>
             <button onClick={onConfirm}>Yes</button>

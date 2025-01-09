@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { LabeledText } from "./components/LabeledText";
 
 import { classnames } from "./util/classNames";
 import st from "./Header.module.css";
 
+interface HeaderProps {
+  hubState: any;
+  isHubStateDialogOpen: boolean;
+  onHubStateDialogOpen: () => void;
+}
+
 export function Header({
   hubState,
   isHubStateDialogOpen,
   onHubStateDialogOpen,
-}) {
+}: HeaderProps) {
   const system_stats = hubState.system_stats;
 
   const dialogCls = classnames("wrap", st.header);

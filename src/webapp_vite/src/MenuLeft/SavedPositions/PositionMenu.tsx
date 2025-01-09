@@ -8,7 +8,25 @@ import { SavePositionDialog } from "./SavePositionDialog";
 import { ConfirmationDialog } from "../../components/ConfirmationDialog";
 import { anglesCloseEnough } from "../../util/angle_utils";
 
-export function PositionMenu({ hubState, positionId, onClose }) {
+interface Position {
+    uuid: string;
+    name: string;
+    description: string;
+    angles: number[];
+}
+
+interface HubState {
+    saved_positions: Position[];
+    set_angles: number[];
+}
+
+interface PositionMenuProps {
+    hubState: HubState;
+    positionId: string;
+    onClose: () => void;
+}
+
+export function PositionMenu({ hubState, positionId, onClose }: PositionMenuProps) {
     const position = useMemo(
         () => hubState.saved_positions.find((p) => p.uuid === positionId),
         [hubState.saved_positions, positionId]
@@ -19,38 +37,42 @@ export function PositionMenu({ hubState, positionId, onClose }) {
         useState(false);
 
     const closeEnough = useMemo(
-        () => anglesCloseEnough(hubState.set_angles, position.angles),
-        [hubState.set_angles, position.angles]
+        () => anglesCloseEnough(hubState.set_angles, position?.angles || []),
+        [hubState.set_angles, position?.angles]
     );
 
     const handleMoveToPosition = useCallback(() => {
-        sendSetAngles(position.angles);
-        onClose();
-    });
+        if (position) {
+            sendSetAngles(position.angles);
+            onClose();
+        }
+    }, [position, onClose]);
 
     const handleEditPosition = useCallback(() => {
         setIsSaveDialogOpen(true);
-    });
+    }, []);
 
     const handleSaveDialogClose = useCallback(() => {
         setIsSaveDialogOpen(false);
-    });
+    }, []);
 
     const handleDeleteClick = useCallback(() => {
         setIsDeleteConfirmationOpen(true);
-    });
+    }, []);
 
     const handleDeleteConfirm = useCallback(() => {
-        const saved_positions = hubState.saved_positions.filter(
-            (p) => p.uuid !== position.uuid
-        );
-        sendHubStateUpdate({ saved_positions });
-        onClose();
-    });
+        if (position) {
+            const saved_positions = hubState.saved_positions.filter(
+                (p) => p.uuid !== position.uuid
+            );
+            sendHubStateUpdate({ saved_positions });
+            onClose();
+        }
+    }, [hubState.saved_positions, position, onClose]);
 
     const handleConfirmCancel = useCallback(() => {
         setIsDeleteConfirmationOpen(false);
-    });
+    }, []);
 
     return !position ? null : (
         <>
@@ -67,7 +89,7 @@ export function PositionMenu({ hubState, positionId, onClose }) {
                     </div>
                 </div>
                 <a
-                    className={closeEnough && "selected disabled"}
+                    className={closeEnough ? "selected disabled" : ""}
                     onClick={handleMoveToPosition}
                 >
                     Move to position
@@ -84,7 +106,7 @@ export function PositionMenu({ hubState, positionId, onClose }) {
             <ConfirmationDialog
                 isOpen={isDeleteConfirmationOpen}
                 title="Delete Saved Position"
-                message={`Are you sure you want to delete '${position.name}"?`}
+                message={`Are you sure you want to delete '${position.name}'?`}
                 onConfirm={handleDeleteConfirm}
                 onCancel={handleConfirmCancel}
             />

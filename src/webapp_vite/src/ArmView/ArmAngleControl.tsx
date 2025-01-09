@@ -1,31 +1,48 @@
-import React, { useState, useEffect, useCallback, useRef, use } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import { findAngle } from "../util/angle_utils";
 import st from "./ArmAngleControl.module.css";
 
 const CIRCLE_CENTER = { x: 100, y: 100 };
 
-export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
+interface ArmControlProps {
+    part: {
+        name: string;
+        motorRange?: number;
+        minAngle?: number;
+        maxAngle?: number;
+    };
+    currentAngle: number;
+    setAngle: number;
+    onSetAngle: (angle: number) => void;
+}
+
+export function ArmControl({
+    part,
+    currentAngle,
+    setAngle,
+    onSetAngle,
+}: ArmControlProps) {
     const [grabberSelected, setGrabberSelected] = useState(false);
     const [grabberHovered, setGrabberHovered] = useState(false);
-    const [changingAngle, setChangingAngle] = useState(null);
-    const svgRef = useRef(null);
+    const [changingAngle, setChangingAngle] = useState<number | null>(null);
+    const svgRef = useRef<SVGSVGElement>(null);
     const motorRange = part.motorRange || 180;
     const minAngle = part.minAngle || 0;
     const maxAngle = part.maxAngle || motorRange;
     const midAngle = (maxAngle + minAngle) / 2;
 
     useEffect(() => {
-        const handleMouseMove = (e) => {
+        const handleMouseMove = (e: MouseEvent | TouchEvent) => {
             if (
                 !svgRef.current ||
                 !grabberSelected ||
-                !(e.clientX || e.touches)
+                !(e instanceof MouseEvent || e.touches)
             ) {
                 return;
             }
-            const clientX = e.clientX || e.touches[0].clientX;
-            const clientY = e.clientY || e.touches[0].clientY;
+            const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+            const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
             const rect = svgRef.current.getBoundingClientRect();
             const centerX = rect.left + CIRCLE_CENTER.x / 2;
             const centerY = rect.top + CIRCLE_CENTER.y;
@@ -52,9 +69,9 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
 
     const handleGrabberMouseDown = useCallback(() => {
         setGrabberSelected(true);
-    });
+    }, []);
 
-    const handleAngleInputChange = useCallback((e) => {
+    const handleAngleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         // allow small increments to be set without needing to press enter
         if (
             !changingAngle &&
@@ -62,22 +79,22 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
         ) {
             handleAngleInputBlur(e);
         } else {
-            setChangingAngle(e.target.value);
+            setChangingAngle(Number.parseFloat(e.target.value));
         }
-    });
+    }, [changingAngle, setAngle]);
 
-    const handleAngleInputBlur = useCallback((e) => {
+    const handleAngleInputBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
         onSetAngle(parseInt(e.target.value));
         setChangingAngle(null);
-    });
+    }, [onSetAngle]);
 
-    const handleAngleInputKeyDown = useCallback((e) => {
+    const handleAngleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
-            handleAngleInputBlur(e);
+            handleAngleInputBlur(e as unknown as React.FocusEvent<HTMLInputElement>);
         }
-    });
+    }, [handleAngleInputBlur]);
 
-    const translateAngle = (angle) => {
+    const translateAngle = (angle: number) => {
         return 90 + midAngle - angle;
     };
 
@@ -101,7 +118,7 @@ export function ArmControl({ part, currentAngle, setAngle, onSetAngle }) {
     return (
         <div className={st.container}>
             <div className={st.currentAngle}>
-                {parseFloat(currentAngle).toFixed(3)}&deg;
+                {parseFloat(currentAngle.toString()).toFixed(3)}&deg;
             </div>
             <div className={st.textLabels}>
                 <label>{part.name}</label>

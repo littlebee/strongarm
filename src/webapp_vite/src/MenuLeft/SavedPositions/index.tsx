@@ -1,4 +1,3 @@
-// Menu left react component to add and show the saved positions in hubstate
 import React, { useState, useCallback, useMemo } from "react";
 
 import { classnames as cx } from "../../util/classNames";
@@ -7,25 +6,41 @@ import { SavePositionDialog } from "./SavePositionDialog";
 import { PositionMenu } from "./PositionMenu";
 import { anglesCloseEnough } from "../../util/angle_utils";
 
-export function SavedPositions({ hubState }) {
+interface HubState {
+    saved_positions: Array<Position>;
+    set_angles: Array<number>;
+}
+
+interface Position {
+    uuid: string;
+    name: string;
+    description: string;
+    angles: Array<number>;
+}
+
+interface SavedPositionsProps {
+    hubState: HubState;
+}
+
+export function SavedPositions({ hubState }: SavedPositionsProps) {
     const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
-    const [selectedPosition, setSelectedPosition] = useState(null);
+    const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
 
     const handleAddPosition = useCallback(() => {
         setIsSaveDialogOpen(true);
-    });
+    }, []);
 
     const handleSaveDialogClose = useCallback(() => {
         setIsSaveDialogOpen(false);
-    });
+    }, []);
 
-    const handlePositionClick = useCallback((position) => {
+    const handlePositionClick = useCallback((position: Position) => {
         setSelectedPosition(position);
-    });
+    }, []);
 
-    const handleUnselectPosition = useCallback((position) => {
+    const handleUnselectPosition = useCallback(() => {
         setSelectedPosition(null);
-    });
+    }, []);
 
     return (
         <>
@@ -63,7 +78,13 @@ export function SavedPositions({ hubState }) {
     );
 }
 
-function PositionItem({ hubState, position, onClick }) {
+interface PositionItemProps {
+    hubState: HubState;
+    position: Position;
+    onClick: (position: Position) => void;
+}
+
+function PositionItem({ hubState, position, onClick }: PositionItemProps) {
     const closeEnough = useMemo(
         () => anglesCloseEnough(hubState.set_angles, position.angles),
         [hubState.set_angles, position.angles]

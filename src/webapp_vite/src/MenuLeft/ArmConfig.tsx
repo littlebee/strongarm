@@ -3,10 +3,19 @@ import React, { useCallback } from "react";
 import { sendArmConfigSelected } from "../util/hubMessages";
 import st from "./ArmConfig.module.css";
 
-export function ArmConfig({ hubState }) {
-    const handleArmConfigClick = useCallback((file) => {
+interface ArmConfigProps {
+    hubState: {
+        arm_config_files: string[];
+        arm_config: {
+            filename: string;
+        };
+    };
+}
+
+export function ArmConfig({ hubState }: ArmConfigProps) {
+    const handleArmConfigClick = useCallback((file: string) => {
         sendArmConfigSelected(file);
-    });
+    }, []);
 
     console.log("rendering ArmConfig", { hubState });
     return (

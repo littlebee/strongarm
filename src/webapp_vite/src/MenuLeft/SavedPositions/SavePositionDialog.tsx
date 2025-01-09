@@ -1,11 +1,8 @@
-// Dialog to save the current_angles to the saved_positions hubstate
-//
 import React, {
     useCallback,
     useState,
     useRef,
     useEffect,
-    use,
     useMemo,
 } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -16,15 +13,22 @@ import { sendHubStateUpdate } from "../../util/hubMessages";
 import st from "./SavePositionDialog.module.css";
 import { Dialog } from "../../components/Dialog";
 
+interface SavePositionDialogProps {
+    hubState: any;
+    existingPosition?: any;
+    isOpen: boolean;
+    onClose: () => void;
+}
+
 export function SavePositionDialog({
     hubState,
     existingPosition,
     isOpen,
     onClose,
-}) {
+}: SavePositionDialogProps) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const focusRef = useRef();
+    const focusRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (existingPosition) {
@@ -64,7 +68,7 @@ export function SavePositionDialog({
     const handleSave = useCallback((withAngles) => {
         savePosition(withAngles);
         onClose();
-    });
+    }, [name, description, existingPosition, hubState, onClose]);
 
     const buttons = useMemo(() => (
         <>
@@ -74,7 +78,7 @@ export function SavePositionDialog({
             </button>
             <button onClick={onClose}>Cancel</button>
         </>
-    ));
+    ), [handleSave, onClose]);
 
     return (
         <Dialog
@@ -96,7 +100,6 @@ export function SavePositionDialog({
                 <div className={st.inputRow}>
                     <label>Description:</label>
                     <textarea
-                        type="text"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />

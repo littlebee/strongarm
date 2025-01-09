@@ -8,8 +8,24 @@ const scene = new THREE.Scene();
 let camera = null;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-const Arm3D = ({ armParts, currentAngles = [] }) => {
-    const mountRef = useRef(null);
+interface Arm3DProps {
+    armParts: Array<{
+        file: string;
+        position: { x: number; y: number; z: number };
+        rotationOffset?: { x: number; y: number; z: number };
+        initialRotation?: { x: number; y: number; z: number };
+        rotationAxis?: string;
+        minAngle?: number;
+        maxAngle?: number;
+        motor_range?: number;
+        invertRotation?: boolean;
+        fixed?: boolean;
+    }>;
+    currentAngles?: number[];
+}
+
+const Arm3D: React.FC<Arm3DProps> = ({ armParts, currentAngles = [] }) => {
+    const mountRef = useRef<HTMLDivElement>(null);
     const parts = useMemo(() => {
         return !armParts
             ? null
@@ -19,10 +35,12 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
               }));
     }, [armParts]);
 
-    useEffect(async () => {
+    useEffect(() => {
         if (!parts || !currentAngles) return;
 
         const mount = mountRef.current;
+        if (!mount) return;
+
         camera = new THREE.PerspectiveCamera(
             75,
             mount.clientWidth / mount.clientHeight,
@@ -45,18 +63,18 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
         directionalLight2.position.set(0, -20, -20);
         scene.add(directionalLight2);
 
-        await loadStlFiles();
-
-        let parent = scene;
-        for (const part of parts) {
-            parent.add(part.threeDObject);
-            part.threeDObject.position.set(
-                part.part.position.x - (part.part.rotationOffset?.x || 0),
-                part.part.position.y - (part.part.rotationOffset?.y || 0),
-                part.part.position.z - (part.part.rotationOffset?.z || 0)
-            );
-            parent = part.threeDObject;
-        }
+        loadStlFiles().then(() => {
+            let parent = scene;
+            for (const part of parts) {
+                parent.add(part.threeDObject);
+                part.threeDObject.position.set(
+                    part.part.position.x - (part.part.rotationOffset?.x || 0),
+                    part.part.position.y - (part.part.rotationOffset?.y || 0),
+                    part.part.position.z - (part.part.rotationOffset?.z || 0)
+                );
+                parent = part.threeDObject;
+            }
+        });
 
         // Camera position
         camera.position.x = -700;
@@ -114,7 +132,7 @@ const Arm3D = ({ armParts, currentAngles = [] }) => {
 
         const promises = [];
         parts.forEach((part, i) => {
-            const promise = new Promise((resolve) => {
+            const promise = new Promise<void>((resolve) => {
                 loader.load("arm-parts/" + part.part.file, (geometry) => {
                     const mesh = new THREE.Mesh(geometry, material);
                     mesh.geometry.center();

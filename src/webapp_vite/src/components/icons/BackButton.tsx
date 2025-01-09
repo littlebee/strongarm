@@ -1,8 +1,11 @@
 import React from "react";
-
 import st from "./BackButton.module.css";
 
-export const BackButton = ({ onClick }) => {
+interface BackButtonProps {
+    onClick: () => void;
+}
+
+export const BackButton: React.FC<BackButtonProps> = ({ onClick }) => {
     return (
         <button
             className={st.backButton}

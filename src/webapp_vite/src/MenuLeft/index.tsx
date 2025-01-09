@@ -10,8 +10,12 @@ import { sendSetAngles } from "../util/hubMessages";
 
 const BASE_NODE_NAME = "Menu Root";
 
-const MenuLeft = ({ hubState }) => {
-    const [itemIndexSelected, setItemIndexSelected] = useState(null);
+interface MenuLeftProps {
+    hubState: any;
+}
+
+const MenuLeft: React.FC<MenuLeftProps> = ({ hubState }) => {
+    const [itemIndexSelected, setItemIndexSelected] = useState<number | null>(null);
     const isAtRootMenu = itemIndexSelected === null;
 
     /*
@@ -43,7 +47,7 @@ const MenuLeft = ({ hubState }) => {
     const movablePartCount = useMemo(
         () =>
             hubState.arm_config.arm_parts.reduce(
-                (acc, part) => (part.movable ? acc + 1 : acc),
+                (acc: number, part: any) => (part.movable ? acc + 1 : acc),
                 0
             ),
         [hubState.arm_config.arm_parts]
@@ -53,17 +57,17 @@ const MenuLeft = ({ hubState }) => {
         ? BASE_NODE_NAME
         : items[itemIndexSelected].name;
 
-    const handleMenuClick = useCallback((itemIndex) => {
+    const handleMenuClick = useCallback((itemIndex: number) => {
         setItemIndexSelected(itemIndex);
-    });
+    }, []);
 
     const handleBackClick = useCallback(() => {
         setItemIndexSelected(null);
-    });
+    }, []);
 
     const handleResetClick = useCallback(() => {
         sendSetAngles(Array(movablePartCount).fill(90));
-    });
+    }, [movablePartCount]);
 
     const buttonsStyle = isAtRootMenu ? { left: 0 } : { left: "-100%" };
     const componentStyle = isAtRootMenu ? { left: "100%" } : { left: 0 };
