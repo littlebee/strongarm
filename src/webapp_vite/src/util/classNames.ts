@@ -1,4 +1,4 @@
-export function classnames(...args) {
+export function classnames(...args: any[]): string {
   let classes = "";
   for (const arg of args) {
     if (!arg) {

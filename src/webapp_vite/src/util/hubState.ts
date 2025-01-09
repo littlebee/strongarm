@@ -61,12 +61,12 @@ export const DEFAULT_HUB_STATE = {
 
 let __hub_state = { ...DEFAULT_HUB_STATE };
 
-let hubStatePromises = [];
-let onUpdateCallbacks = [];
+let hubStatePromises: Array<(state: any) => void> = [];
+let onUpdateCallbacks: Array<(state: any) => void> = [];
 let lastHubUpdate = Date.now();
-let hubMonitor = null;
+let hubMonitor: NodeJS.Timeout | null = null;
 
-export let webSocket = null;
+export let webSocket: WebSocket | null = null;
 
 export function connectToHub(state = DEFAULT_HUB_STATE) {
     try {
@@ -79,11 +79,11 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
             lastHubUpdate = Date.now();
 
             try {
-                webSocket.send(JSON.stringify({ type: "getState" }));
-                webSocket.send(
+                webSocket!.send(JSON.stringify({ type: "getState" }));
+                webSocket!.send(
                     JSON.stringify({ type: "identity", data: "webapp" })
                 );
-                webSocket.send(
+                webSocket!.send(
                     JSON.stringify({ type: "subscribeState", data: "*" })
                 );
                 setHubConnStatus("online");
@@ -137,7 +137,7 @@ function startHubMonitor() {
     hubMonitor = setInterval(() => {
         // if the socket is hung or there is no network,
         // the websocket will not error out until we send something
-        webSocket.send(JSON.stringify({ type: "ping" }));
+        webSocket!.send(JSON.stringify({ type: "ping" }));
 
         if (
             __hub_state.hubConnStatus === "online" &&
@@ -155,11 +155,11 @@ function stopHubMonitor() {
 }
 
 // handler gets called with __hub_state
-export function addHubStateUpdatedListener(handler) {
+export function addHubStateUpdatedListener(handler: (state: any) => void) {
     onUpdateCallbacks.push(handler);
 }
 
-export function removeHubStateUpdatedListener(handler) {
+export function removeHubStateUpdatedListener(handler: (state: any) => void) {
     const index = onUpdateCallbacks.indexOf(handler);
     if (index !== -1) {
         onUpdateCallbacks.splice(index, 1);
@@ -171,18 +171,18 @@ export function getLocalState() {
 }
 
 export function getStateFromCentralHub() {
-    const statePromise = new Promise((resolve) =>
+    const statePromise = new Promise<any>((resolve) =>
         hubStatePromises.push(resolve)
     );
-    webSocket.send(JSON.stringify({ type: "getState" }));
+    webSocket!.send(JSON.stringify({ type: "getState" }));
     return statePromise;
 }
 
-export function updateSharedState(newState) {
-    webSocket.send(JSON.stringify({ type: "updateState", data: newState }));
+export function updateSharedState(newState: any) {
+    webSocket!.send(JSON.stringify({ type: "updateState", data: newState }));
 }
 
-function delayedConnectToHub(state) {
+function delayedConnectToHub(state: any) {
     setTimeout(() => {
         if (state.hubConnStatus === "offline") {
             connectToHub(state);
@@ -190,7 +190,7 @@ function delayedConnectToHub(state) {
     }, 5000);
 }
 
-function onConnError(state, e) {
+function onConnError(state: any, e: any) {
     console.error(
         "got close message from central-hub socket. will attempt to reconnnect in 5 seconds",
         e
@@ -201,13 +201,13 @@ function onConnError(state, e) {
 }
 
 // not exported, should only be called from connectToHub
-function setHubConnStatus(newStatus) {
+function setHubConnStatus(newStatus: string) {
     logMessage("setting conn status", newStatus);
     __hub_state.hubConnStatus = newStatus;
     emitUpdated();
 }
 
-function updateStateFromCentralHub(hubData) {
+function updateStateFromCentralHub(hubData: any) {
     for (const [key, value] of Object.entries(hubData)) {
         // TODO : maybe merge the state with incoming.
         // State for any top level key must be whole
@@ -222,7 +222,7 @@ function emitUpdated() {
     }
 }
 
-export function logMessage(...args) {
+export function logMessage(...args: any[]) {
     if (logMessages) {
         console.log(...args);
     }
