@@ -1,26 +1,14 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 import Arm3D from "./Arm3d";
 
 import st from "./index.module.css";
 import { ArmAngleControls } from "./ArmAngleControls";
-
-interface HubState {
-    arm_config: {
-        arm_parts: Array<{
-            fixed: boolean;
-        }>;
-        [key: string]: any;
-    };
-    current_angles: number[];
-    set_angles: number[];
-}
+import { IHubState } from "../util/hubState";
 
 interface ArmViewProps {
-    hubState: HubState;
+    hubState: IHubState;
 }
-
-const lastCurrentAngles = null;
 
 export function ArmView({ hubState }: ArmViewProps) {
     // console.log("ArmView", { hubState, lastCurrentAngles });

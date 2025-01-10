@@ -1,21 +1,23 @@
 import React, { useCallback, useState, useMemo } from "react";
 
-import { classnames } from "../util/classNames";
 import st from "./index.module.css";
 import { BackButton } from "../components/icons/BackButton";
 
 import { ArmConfig } from "./ArmConfig";
 import { SavedPositions } from "./SavedPositions";
 import { sendSetAngles } from "../util/hubMessages";
+import { IArmPart, IHubState } from "../util/hubState";
 
 const BASE_NODE_NAME = "Menu Root";
 
 interface MenuLeftProps {
-    hubState: any;
+    hubState: IHubState;
 }
 
 const MenuLeft: React.FC<MenuLeftProps> = ({ hubState }) => {
-    const [itemIndexSelected, setItemIndexSelected] = useState<number | null>(null);
+    const [itemIndexSelected, setItemIndexSelected] = useState<number | null>(
+        null
+    );
     const isAtRootMenu = itemIndexSelected === null;
 
     /*
@@ -47,7 +49,7 @@ const MenuLeft: React.FC<MenuLeftProps> = ({ hubState }) => {
     const movablePartCount = useMemo(
         () =>
             hubState.arm_config.arm_parts.reduce(
-                (acc: number, part: any) => (part.movable ? acc + 1 : acc),
+                (acc: number, part: IArmPart) => (part.fixed ? acc : acc + 1),
                 0
             ),
         [hubState.arm_config.arm_parts]

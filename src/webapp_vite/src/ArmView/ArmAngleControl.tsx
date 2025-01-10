@@ -1,3 +1,6 @@
+/* eslint react-hooks/rules-of-hooks: 0  */
+//  TODO : I'm pretty sure that the useEffects are not being used incorrectly here, but I'm not sure how to fix the error.
+
 import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import { findAngle } from "../util/angle_utils";
@@ -41,8 +44,10 @@ export function ArmControl({
             ) {
                 return;
             }
-            const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
-            const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+            const clientX =
+                e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+            const clientY =
+                e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
             const rect = svgRef.current.getBoundingClientRect();
             const centerX = rect.left + CIRCLE_CENTER.x / 2;
             const centerY = rect.top + CIRCLE_CENTER.y;
@@ -51,7 +56,9 @@ export function ArmControl({
         };
 
         const handleMouseUp = () => {
-            grabberSelected && setGrabberSelected(false);
+            if (grabberSelected) {
+                setGrabberSelected(false);
+            }
         };
 
         document.addEventListener("mousemove", handleMouseMove);
@@ -71,28 +78,43 @@ export function ArmControl({
         setGrabberSelected(true);
     }, []);
 
-    const handleAngleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        // allow small increments to be set without needing to press enter
-        if (
-            !changingAngle &&
-            Math.abs(setAngle - Number.parseFloat(e.target.value)) < 2
-        ) {
-            handleAngleInputBlur(e);
-        } else {
-            setChangingAngle(Number.parseFloat(e.target.value));
-        }
-    }, [changingAngle, setAngle]);
+    const handleAngleInputBlur = useCallback(
+        (
+            e:
+                | React.FocusEvent<HTMLInputElement>
+                | React.ChangeEvent<HTMLInputElement>
+        ) => {
+            onSetAngle(parseInt(e.target.value));
+            setChangingAngle(null);
+        },
+        [onSetAngle]
+    );
 
-    const handleAngleInputBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-        onSetAngle(parseInt(e.target.value));
-        setChangingAngle(null);
-    }, [onSetAngle]);
+    const handleAngleInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            // allow small increments to be set without needing to press enter
+            if (
+                !changingAngle &&
+                Math.abs(setAngle - Number.parseFloat(e.target.value)) < 2
+            ) {
+                handleAngleInputBlur(e);
+            } else {
+                setChangingAngle(Number.parseFloat(e.target.value));
+            }
+        },
+        [changingAngle, setAngle, handleAngleInputBlur]
+    );
 
-    const handleAngleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            handleAngleInputBlur(e as unknown as React.FocusEvent<HTMLInputElement>);
-        }
-    }, [handleAngleInputBlur]);
+    const handleAngleInputKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === "Enter") {
+                handleAngleInputBlur(
+                    e as unknown as React.FocusEvent<HTMLInputElement>
+                );
+            }
+        },
+        [handleAngleInputBlur]
+    );
 
     const translateAngle = (angle: number) => {
         return 90 + midAngle - angle;

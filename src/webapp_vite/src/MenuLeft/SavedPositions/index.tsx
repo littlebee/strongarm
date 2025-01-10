@@ -1,30 +1,20 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { classnames as cx } from "../../util/classNames";
 import st from "./index.module.css";
 import { SavePositionDialog } from "./SavePositionDialog";
 import { PositionMenu } from "./PositionMenu";
 import { anglesCloseEnough } from "../../util/angle_utils";
-
-interface HubState {
-    saved_positions: Array<Position>;
-    set_angles: Array<number>;
-}
-
-interface Position {
-    uuid: string;
-    name: string;
-    description: string;
-    angles: Array<number>;
-}
+import { IHubState, ISavedPosition } from "../../util/hubState";
 
 interface SavedPositionsProps {
-    hubState: HubState;
+    hubState: IHubState;
 }
 
 export function SavedPositions({ hubState }: SavedPositionsProps) {
     const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
-    const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
+    const [selectedPosition, setSelectedPosition] =
+        useState<ISavedPosition | null>(null);
 
     const handleAddPosition = useCallback(() => {
         setIsSaveDialogOpen(true);
@@ -34,7 +24,7 @@ export function SavedPositions({ hubState }: SavedPositionsProps) {
         setIsSaveDialogOpen(false);
     }, []);
 
-    const handlePositionClick = useCallback((position: Position) => {
+    const handlePositionClick = useCallback((position: ISavedPosition) => {
         setSelectedPosition(position);
     }, []);
 
@@ -79,9 +69,9 @@ export function SavedPositions({ hubState }: SavedPositionsProps) {
 }
 
 interface PositionItemProps {
-    hubState: HubState;
-    position: Position;
-    onClick: (position: Position) => void;
+    hubState: IHubState;
+    position: ISavedPosition;
+    onClick: (position: ISavedPosition) => void;
 }
 
 function PositionItem({ hubState, position, onClick }: PositionItemProps) {

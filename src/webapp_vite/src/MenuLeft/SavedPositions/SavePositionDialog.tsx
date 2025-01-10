@@ -1,21 +1,15 @@
-import React, {
-    useCallback,
-    useState,
-    useRef,
-    useEffect,
-    useMemo,
-} from "react";
+import { useCallback, useState, useRef, useEffect, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { classnames as cx } from "../../util/classNames";
 import { sendHubStateUpdate } from "../../util/hubMessages";
+import { IHubState, ISavedPosition } from "../../util/hubState";
 
 import st from "./SavePositionDialog.module.css";
 import { Dialog } from "../../components/Dialog";
 
 interface SavePositionDialogProps {
-    hubState: any;
-    existingPosition?: any;
+    hubState: IHubState;
+    existingPosition?: ISavedPosition;
     isOpen: boolean;
     onClose: () => void;
 }
@@ -65,20 +59,26 @@ export function SavePositionDialog({
         }
         sendHubStateUpdate({ saved_positions });
     }
-    const handleSave = useCallback((withAngles) => {
-        savePosition(withAngles);
-        onClose();
-    }, [name, description, existingPosition, hubState, onClose]);
+    const handleSave = useCallback(
+        (withAngles: boolean) => {
+            savePosition(withAngles);
+            onClose();
+        },
+        [name, description, existingPosition, hubState, onClose]
+    );
 
-    const buttons = useMemo(() => (
-        <>
-            <button onClick={() => handleSave(false)}>Save</button>
-            <button onClick={() => handleSave(true)}>
-                Save w/ current angles
-            </button>
-            <button onClick={onClose}>Cancel</button>
-        </>
-    ), [handleSave, onClose]);
+    const buttons = useMemo(
+        () => (
+            <>
+                <button onClick={() => handleSave(false)}>Save</button>
+                <button onClick={() => handleSave(true)}>
+                    Save w/ current angles
+                </button>
+                <button onClick={onClose}>Cancel</button>
+            </>
+        ),
+        [handleSave, onClose]
+    );
 
     return (
         <Dialog

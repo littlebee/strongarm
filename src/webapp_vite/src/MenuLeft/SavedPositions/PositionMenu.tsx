@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { classnames as cx } from "../../util/classNames";
 import { sendHubStateUpdate, sendSetAngles } from "../../util/hubMessages";
@@ -7,26 +7,19 @@ import st from "./PositionMenu.module.css";
 import { SavePositionDialog } from "./SavePositionDialog";
 import { ConfirmationDialog } from "../../components/ConfirmationDialog";
 import { anglesCloseEnough } from "../../util/angle_utils";
-
-interface Position {
-    uuid: string;
-    name: string;
-    description: string;
-    angles: number[];
-}
-
-interface HubState {
-    saved_positions: Position[];
-    set_angles: number[];
-}
+import { IHubState } from "../../util/hubState";
 
 interface PositionMenuProps {
-    hubState: HubState;
+    hubState: IHubState;
     positionId: string;
     onClose: () => void;
 }
 
-export function PositionMenu({ hubState, positionId, onClose }: PositionMenuProps) {
+export function PositionMenu({
+    hubState,
+    positionId,
+    onClose,
+}: PositionMenuProps) {
     const position = useMemo(
         () => hubState.saved_positions.find((p) => p.uuid === positionId),
         [hubState.saved_positions, positionId]

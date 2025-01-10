@@ -1,32 +1,30 @@
 import React, { useRef, useEffect, useMemo } from "react";
 import * as THREE from "three";
+// @ts-expect-error "@types/three" does not have OrbitControls
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+// @ts-expect-error "@types/three" does not have STLLoader
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { degToRad } from "three/src/math/MathUtils.js";
 
+import { IArmPart } from "../util/hubState";
+
 const scene = new THREE.Scene();
-let camera = null;
+let camera: THREE.Camera | null = null;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
 interface Arm3DProps {
-    armParts: Array<{
-        file: string;
-        position: { x: number; y: number; z: number };
-        rotationOffset?: { x: number; y: number; z: number };
-        initialRotation?: { x: number; y: number; z: number };
-        rotationAxis?: string;
-        minAngle?: number;
-        maxAngle?: number;
-        motor_range?: number;
-        invertRotation?: boolean;
-        fixed?: boolean;
-    }>;
+    armParts: IArmPart[];
     currentAngles?: number[];
+}
+
+interface Part3D {
+    threeDObject: THREE.Object3D | null;
+    part: IArmPart;
 }
 
 const Arm3D: React.FC<Arm3DProps> = ({ armParts, currentAngles = [] }) => {
     const mountRef = useRef<HTMLDivElement>(null);
-    const parts = useMemo(() => {
+    const parts: Part3D[] | null = useMemo(() => {
         return !armParts
             ? null
             : armParts.map((part) => ({
@@ -64,8 +62,10 @@ const Arm3D: React.FC<Arm3DProps> = ({ armParts, currentAngles = [] }) => {
         scene.add(directionalLight2);
 
         loadStlFiles().then(() => {
-            let parent = scene;
+            let parent: THREE.Object3D = scene;
             for (const part of parts) {
+                if (!part.threeDObject) continue;
+
                 parent.add(part.threeDObject);
                 part.threeDObject.position.set(
                     part.part.position.x - (part.part.rotationOffset?.x || 0),
@@ -107,7 +107,7 @@ const Arm3D: React.FC<Arm3DProps> = ({ armParts, currentAngles = [] }) => {
                         const initial = part.part.initialRotation?.[axis] || 0;
                         const minAngle = part.part.minAngle || 0;
                         const maxAngle =
-                            part.part.maxAngle || part.part.motor_range || 270;
+                            part.part.maxAngle || part.part.motorRange || 270;
                         const midAngle = minAngle + (maxAngle - minAngle) / 2;
                         let newAngle =
                             midAngle - currentAngles[index] + initial;
@@ -118,7 +118,9 @@ const Arm3D: React.FC<Arm3DProps> = ({ armParts, currentAngles = [] }) => {
                     }
                 }
             });
-            renderer.render(scene, camera);
+            if (camera) {
+                renderer.render(scene, camera);
+            }
         };
 
         animate();
@@ -130,38 +132,41 @@ const Arm3D: React.FC<Arm3DProps> = ({ armParts, currentAngles = [] }) => {
             color: 0xff5533,
         });
 
-        const promises = [];
-        parts.forEach((part, i) => {
+        const promises: Array<Promise<void>> = [];
+        parts?.forEach((part) => {
             const promise = new Promise<void>((resolve) => {
-                loader.load("arm-parts/" + part.part.file, (geometry) => {
-                    const mesh = new THREE.Mesh(geometry, material);
-                    mesh.geometry.center();
-                    const pivot = new THREE.Object3D();
-                    // Add the mesh to the pivot
-                    pivot.add(mesh);
+                loader.load(
+                    "arm-parts/" + part.part.file,
+                    (geometry: THREE.ShapeGeometry) => {
+                        const mesh = new THREE.Mesh(geometry, material);
+                        mesh.geometry.center();
+                        const pivot = new THREE.Object3D();
+                        // Add the mesh to the pivot
+                        pivot.add(mesh);
 
-                    // Position the mesh relative to the pivot
-                    if (part.part.rotationOffset) {
-                        mesh.position.setX(part.part.rotationOffset.x || 0);
-                        mesh.position.setY(part.part.rotationOffset.y || 0);
-                        mesh.position.setZ(part.part.rotationOffset.z || 0);
-                    }
+                        // Position the mesh relative to the pivot
+                        if (part.part.rotationOffset) {
+                            mesh.position.setX(part.part.rotationOffset.x || 0);
+                            mesh.position.setY(part.part.rotationOffset.y || 0);
+                            mesh.position.setZ(part.part.rotationOffset.z || 0);
+                        }
 
-                    // Rotate the pivot instead of the mesh
-                    if (part.part.initialRotation) {
-                        pivot.rotation.x = degToRad(
-                            part.part.initialRotation.x || 0
-                        );
-                        pivot.rotation.y = degToRad(
-                            part.part.initialRotation.y || 0
-                        );
-                        pivot.rotation.z = degToRad(
-                            part.part.initialRotation.z || 0
-                        );
+                        // Rotate the pivot instead of the mesh
+                        if (part.part.initialRotation) {
+                            pivot.rotation.x = degToRad(
+                                part.part.initialRotation.x || 0
+                            );
+                            pivot.rotation.y = degToRad(
+                                part.part.initialRotation.y || 0
+                            );
+                            pivot.rotation.z = degToRad(
+                                part.part.initialRotation.z || 0
+                            );
+                        }
+                        part.threeDObject = pivot;
+                        resolve();
                     }
-                    part.threeDObject = pivot;
-                    resolve();
-                });
+                );
             });
             promises.push(promise);
         });

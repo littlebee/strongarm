@@ -4,39 +4,32 @@ import { classnames } from "./util/classNames";
 import { Button } from "./components/Button";
 import st from "./HubStateDialog.module.css";
 
-import { getStateFromCentralHub } from "./util/hubState";
+import { getStateFromCentralHub, IHubState } from "./util/hubState";
 
 const LOCAL_STATE = 0;
 const REMOTE_STATE = 1;
 
-interface HubState {
-    // Define the structure of hubState here
-    [key: string]: any;
-}
-
 interface HubStateDialogProps {
-    hubState: HubState;
+    hubState: IHubState;
     isOpen: boolean;
     onClose: () => void;
 }
 
-export function HubStateDialog({ hubState, isOpen, onClose }: HubStateDialogProps) {
+export function HubStateDialog({
+    hubState,
+    isOpen,
+    onClose,
+}: HubStateDialogProps) {
     const [whichState, setWhichState] = useState(LOCAL_STATE);
     const [remoteState, setRemoteState] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
 
     const closedClass = !isOpen ? st.closed : null;
-
-    function handleRemoteLoadError(e: any) {
-        console.error("error loading remote state", e);
-    }
 
     async function loadRemoteState() {
         setRemoteState(await getStateFromCentralHub());
     }
 
     function handleStateChange(newState: number) {
-        setIsLoading(true);
         setWhichState(newState);
 
         if (newState === REMOTE_STATE) {

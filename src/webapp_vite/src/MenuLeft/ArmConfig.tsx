@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 
 import { sendArmConfigSelected } from "../util/hubMessages";
 import st from "./ArmConfig.module.css";
@@ -29,7 +29,7 @@ export function ArmConfig({ hubState }: ArmConfigProps) {
                             className={
                                 (file === hubState.arm_config.filename &&
                                     "selected") ||
-                                null
+                                ""
                             }
                         >
                             {file}

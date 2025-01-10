@@ -1,5 +1,4 @@
-import React, { useCallback, useState, useRef, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import React, { useCallback, useRef, useEffect } from "react";
 
 import { classnames as cx } from "../util/classNames";
 import st from "./Dialog.module.css";
@@ -12,7 +11,13 @@ interface DialogProps {
     children: React.ReactNode;
 }
 
-export function Dialog({ title, isOpen, onClose, buttons, children }: DialogProps) {
+export function Dialog({
+    title,
+    isOpen,
+    onClose,
+    buttons,
+    children,
+}: DialogProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -20,6 +25,7 @@ export function Dialog({ title, isOpen, onClose, buttons, children }: DialogProp
             console.log("focusRef.current.focus()");
             dialogRef.current
                 ?.querySelector(":first-child input,button,textarea")
+                // @ts-expect-error html input, button, textarea most certainly have a focus method
                 ?.focus();
         }
     }, [isOpen, dialogRef]);
@@ -42,11 +48,14 @@ export function Dialog({ title, isOpen, onClose, buttons, children }: DialogProp
         };
     }, [isOpen, onClose]);
 
-    const handleBackdropClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) {
-            onClose();
-        }
-    }, [onClose]);
+    const handleBackdropClick = useCallback(
+        (e: React.MouseEvent<HTMLDivElement>) => {
+            if (e.target === e.currentTarget) {
+                onClose();
+            }
+        },
+        [onClose]
+    );
 
     return (
         <div

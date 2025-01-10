@@ -29,7 +29,9 @@ export function ButtonFaderCombo({
     const [isFading, setIsFading] = useState(false);
     const buttonRef = useRef<HTMLDivElement>(null);
 
-    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const handleMouseDown = (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>
+    ) => {
         if (isSelected) {
             setMouseDownX(e.clientX);
         } else {
@@ -65,10 +67,18 @@ export function ButtonFaderCombo({
         }
 
         if (!isFading && isSelected && Math.abs(e.clientX - mouseDownX) < 10) {
-            onClick(e as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>);
+            onClick(
+                e as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>
+            );
         }
         setMouseDownX(null);
         setIsFading(false);
+    };
+
+    const handleMouseLeave = (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>
+    ) => {
+        handleMouseUp(e as unknown as MouseEvent);
     };
 
     const faderCls = classnames(
@@ -101,7 +111,7 @@ export function ButtonFaderCombo({
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
-                onMouseLeave={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
             >
                 <div className={faderCls} style={faderStyle} />
                 <div className={st.content}>{children}</div>

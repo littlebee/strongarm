@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-import * as c from "./constants";
 import {
     DEFAULT_HUB_STATE,
     connectToHub,
     addHubStateUpdatedListener,
     removeHubStateUpdatedListener,
+
+    IHubState
 } from "./util/hubState";
 
 import { Header } from "./Header";
@@ -14,28 +15,9 @@ import { HubStateDialog } from "./HubStateDialog";
 import { ArmView } from "./ArmView";
 import MenuLeft from "./MenuLeft";
 
-interface HubState {
-    system_stats: {
-        cpu_temp: number;
-        cpu_util: number;
-        ram_util: number;
-    };
-    hubConnStatus: string;
-    arm_config: {
-        arm_parts: any[];
-    };
-    current_angles: number[];
-    set_angles: number[];
-}
-
-interface AppProps {
-    hubState: HubState;
-    isHubStateDialogOpen: boolean;
-    onHubStateDialogOpen: () => void;
-}
 
 function App() {
-    const [hubState, setHubState] = useState<HubState>(DEFAULT_HUB_STATE);
+    const [hubState, setHubState] = useState<IHubState>(DEFAULT_HUB_STATE);
     const [isHubStateDialogOpen, setIsHubStateDialogOpen] = useState(false);
 
     useEffect(() => {
@@ -45,7 +27,7 @@ function App() {
         return () => removeHubStateUpdatedListener(handleHubStateUpdated);
     }, []);
 
-    const handleHubStateUpdated = (newState: HubState) => {
+    const handleHubStateUpdated = (newState: IHubState) => {
         setHubState({ ...newState });
     };
 

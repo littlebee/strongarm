@@ -12,59 +12,96 @@ const HUB_PING_INTERVAL = 1000;
 // messages from hub.  Otherwise, we show "offline"
 const MIN_HUB_UPDATE_INTERVAL = 1500;
 
-export const HUB_PORT = process.env.HUB_PORT || 5800;
-
+export const HUB_PORT = 5800;
 export const HUB_HOST = `${window.location.hostname}:${HUB_PORT}`;
-
 export const HUB_URL = `ws://${HUB_HOST}/ws`;
 
-export const DEFAULT_HUB_STATE = {
-    // this is for the UI only
-    hubConnStatus: "offline",
+export interface IVec3 {
+    x: number;
+    y: number;
+    z: number;
+}
 
+export interface IArmPart {
+    name: string;
+    file: string;
+    position: IVec3;
+    fixed?: boolean;
+
+    // rotation
+    initialRotation?: IVec3;
+    rotationOffset?: IVec3;
+    invertRotation?: boolean;
+    rotationAxis?: "x" | "y" | "z";
+
+    // range of motion
+    motorRange?: number;
+    minAngle?: number;
+    maxAngle?: number;
+}
+
+export interface ISavedPosition {
+    uuid: string;
+    name: string;
+    description: string;
+    angles: number[];
+}
+
+export interface IHubState {
+    // this is for the UI only
+    hubConnStatus?: string;
     // the keys below are shared from central hub.  See hub_state.py
+    hub_stats: {
+        state_updates_recv: number;
+    };
+    // currently selected arm config provided by
+    // arms_config_provider
+    arm_config: {
+        filename: string;
+        description: string;
+        arm_parts: IArmPart[];
+    };
+    // array of json file names provided to central hub
+    // by arms_config_provider
+    arm_config_files: string[];
+    // initially by arms_config_provider to last selected, can be changed
+    // to any of the arm_configs
+    arm_config_selected: string;
+
+    // actual angles last reported by servos
+    current_angles: number[];
+    //last requested angles
+    set_angles: number[];
+
+    // saved positions provided initially by central hub via serialized keys
+    // and updated by the UI.
+    saved_positions: ISavedPosition[];
+}
+
+export const DEFAULT_HUB_STATE: IHubState = {
+    hubConnStatus: "offline",
 
     // provided by central_hub/
     hub_stats: { state_updates_recv: 0 },
-    //last requested angles
-    set_angles: [],
-    // actual angles last reported by servos
-    current_angles: [],
-
-    // array of json file names provided to central hub
-    // by arms_config_provider
-    arm_config_files: [],
-
-    // initially by arms_config_provider to last selected, can be changed
-    // to any of the arm_configs
-    arm_config_selected: "",
-
-    // currently selected arm config provided by
-    // arms_config_provider
     arm_config: {
         filename: "",
         description: "",
         arm_parts: [],
     },
+    arm_config_files: [],
+    arm_config_selected: "",
 
-    // saved positions provided initially by saved_positions_provider
-    // and updated by the UI.   This should be an array of objects like:
-    // {
-    //   "name": "some name",
-    //   "description": "some description",
-    //   "angles": [0, 90, 90, 90, 90, 90]
-    // }
+    set_angles: [],
+    current_angles: [],
     saved_positions: [],
-
-    subsystem_stats: {},
 };
 
-let __hub_state = { ...DEFAULT_HUB_STATE };
+const __hub_state: IHubState = { ...DEFAULT_HUB_STATE };
 
-let hubStatePromises: Array<(state: any) => void> = [];
-let onUpdateCallbacks: Array<(state: any) => void> = [];
+const onUpdateCallbacks: Array<(state: IHubState) => void> = [];
+let hubStatePromises: Array<(state: IHubState) => void> = [];
 let lastHubUpdate = Date.now();
-let hubMonitor: NodeJS.Timeout | null = null;
+let hubMonitor: number | null = null;
 
 export let webSocket: WebSocket | null = null;
 
@@ -75,7 +112,7 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
 
         webSocket = new WebSocket(HUB_URL);
 
-        webSocket.addEventListener("open", function (event) {
+        webSocket.addEventListener("open", function () {
             lastHubUpdate = Date.now();
 
             try {
@@ -88,7 +125,7 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
                 );
                 setHubConnStatus("online");
             } catch (e) {
-                onConnError(state, e);
+                onConnError(state, e as Error);
             }
             startHubMonitor();
         });
@@ -98,7 +135,10 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
         });
 
         webSocket.addEventListener("close", function (event) {
-            onConnError(state, event);
+            onConnError(
+                state,
+                new Error(`websocket close code: ${event.code}`)
+            );
         });
 
         webSocket.addEventListener("message", function (event) {
@@ -128,7 +168,7 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
             }
         });
     } catch (e) {
-        onConnError(state, e);
+        onConnError(state, e as Error);
     }
 }
 
@@ -155,11 +195,15 @@ function stopHubMonitor() {
 }
 
 // handler gets called with __hub_state
-export function addHubStateUpdatedListener(handler: (state: any) => void) {
+export function addHubStateUpdatedListener(
+    handler: (state: IHubState) => void
+) {
     onUpdateCallbacks.push(handler);
 }
 
-export function removeHubStateUpdatedListener(handler: (state: any) => void) {
+export function removeHubStateUpdatedListener(
+    handler: (state: IHubState) => void
+) {
     const index = onUpdateCallbacks.indexOf(handler);
     if (index !== -1) {
         onUpdateCallbacks.splice(index, 1);
@@ -171,18 +215,18 @@ export function getLocalState() {
 }
 
 export function getStateFromCentralHub() {
-    const statePromise = new Promise<any>((resolve) =>
+    const statePromise = new Promise<IHubState>((resolve) =>
         hubStatePromises.push(resolve)
     );
     webSocket!.send(JSON.stringify({ type: "getState" }));
     return statePromise;
 }
 
-export function updateSharedState(newState: any) {
+export function updateSharedState(newState: IHubState) {
     webSocket!.send(JSON.stringify({ type: "updateState", data: newState }));
 }
 
-function delayedConnectToHub(state: any) {
+function delayedConnectToHub(state: IHubState) {
     setTimeout(() => {
         if (state.hubConnStatus === "offline") {
             connectToHub(state);
@@ -190,7 +234,7 @@ function delayedConnectToHub(state: any) {
     }, 5000);
 }
 
-function onConnError(state: any, e: any) {
+function onConnError(state: IHubState, e: Error) {
     console.error(
         "got close message from central-hub socket. will attempt to reconnnect in 5 seconds",
         e
@@ -207,10 +251,9 @@ function setHubConnStatus(newStatus: string) {
     emitUpdated();
 }
 
-function updateStateFromCentralHub(hubData: any) {
+function updateStateFromCentralHub(hubData: IHubState) {
     for (const [key, value] of Object.entries(hubData)) {
-        // TODO : maybe merge the state with incoming.
-        // State for any top level key must be whole
+        // @ts-expect-error hub state from central hub is not strongly typed
         __hub_state[key] = value;
     }
     emitUpdated();
@@ -222,6 +265,8 @@ function emitUpdated() {
     }
 }
 
+// args can be any args that are valid for console.log which by definition any
+// eslint-disable-next-line
 export function logMessage(...args: any[]) {
     if (logMessages) {
         console.log(...args);

@@ -1,23 +1,31 @@
-import React, { useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 
+import { IArmPart } from "../util/hubState";
 import { sendSetAngles } from "../util/hubMessages";
 import { ArmControl } from "./ArmAngleControl";
 
 import st from "./ArmAngleControls.module.css";
 
 interface ArmAngleControlsProps {
-    parts: any[];
+    parts: IArmPart[];
     currentAngles: number[];
     setAngles: number[];
 }
 
-export function ArmAngleControls({ parts, currentAngles, setAngles }: ArmAngleControlsProps) {
-    const handleOnSetAngle = useCallback((angleIndex, angle) => {
-        console.log("setting angle", { angleIndex, angle });
-        const newAngles = [...setAngles];
-        newAngles[angleIndex] = angle;
-        sendSetAngles(newAngles);
-    }, [setAngles]);
+export function ArmAngleControls({
+    parts,
+    currentAngles,
+    setAngles,
+}: ArmAngleControlsProps) {
+    const handleOnSetAngle = useCallback(
+        (angleIndex: number, angle: number) => {
+            console.log("setting angle", { angleIndex, angle });
+            const newAngles = [...setAngles];
+            newAngles[angleIndex] = angle;
+            sendSetAngles(newAngles);
+        },
+        [setAngles]
+    );
 
     const controls = useMemo(() => {
         if (!parts?.length) return null;
