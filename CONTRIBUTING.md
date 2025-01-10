@@ -26,7 +26,7 @@ conda env export > conda_env_export.yml
 
 Uses pytest for running tests.   The tests are capable of full integration testing.  The helpers in tests/helpers.  Use the functions in tests/helpers/start_stop.py to start and stop just the services needed for the given test module.   Services are started using the same scripts (start.sh and stop.sh) used to start them in production.
 
-The only things we mock during testing are related to robot hardware specific things, for example,
+The only things we mock during testing are related to robot hardware specific things, for example, the [servo control lib](https://github.com/littlebee/strongarm/blob/79ba6f7243c4ec0955e1ae1eabb3a3f58b2f47bb/src/commons/servo.py#L11).
 
 To run all tests:
 ```
