@@ -133,6 +133,19 @@ export function ArmControl({
         );
     }
 
+    const handleCircleClick = (
+        event: React.MouseEvent<SVGCircleElement, MouseEvent>
+    ) => {
+        const svg = svgRef.current;
+        if (!svg) return;
+
+        const rect = svgRef.current.getBoundingClientRect();
+        const centerX = rect.left + CIRCLE_CENTER.x / 2;
+        const centerY = rect.top + CIRCLE_CENTER.y;
+        const angle = findAngle(centerX, centerY, event.clientX, event.clientY);
+        onSetAngle(angle * -1);
+    };
+
     return (
         <div className={st.container}>
             <div className={st.currentAngle}>
@@ -165,7 +178,8 @@ export function ArmControl({
                     r={90}
                     fill="none"
                     stroke="#c777"
-                    strokeWidth="10"
+                    strokeWidth="14"
+                    onClick={handleCircleClick}
                 />
                 <g
                     transform={`rotate(${translateAngle(setAngle)} ${
