@@ -16,6 +16,12 @@ interface ArmControlProps {
     onSetAngle: (angle: number) => void;
 }
 
+function isTouchEvent(
+    e: React.TouchEvent | React.MouseEvent
+): e is React.TouchEvent {
+    return e.nativeEvent instanceof TouchEvent;
+}
+
 export function ArmControl({
     part,
     currentAngle,
@@ -133,16 +139,18 @@ export function ArmControl({
         );
     }
 
-    const handleCircleClick = (
-        event: React.MouseEvent<SVGCircleElement, MouseEvent>
-    ) => {
+    const handleCircleClick = (event: React.MouseEvent | React.TouchEvent) => {
         const svg = svgRef.current;
         if (!svg) return;
+        const isTouch = isTouchEvent(event);
 
+        const clientX = isTouch ? event.touches[0].clientX : event.clientX;
+        const clientY = isTouch ? event.touches[0].clientY : event.clientY;
         const rect = svgRef.current.getBoundingClientRect();
         const centerX = rect.left + CIRCLE_CENTER.x / 2;
         const centerY = rect.top + CIRCLE_CENTER.y;
-        const angle = findAngle(centerX, centerY, event.clientX, event.clientY);
+
+        const angle = findAngle(centerX, centerY, clientX, clientY);
         onSetAngle(angle * -1);
     };
 
@@ -173,6 +181,7 @@ export function ArmControl({
             </div>
             <svg width="200" height="100" viewBox="0 0 200 180" ref={svgRef}>
                 <circle
+                    className={st.circle}
                     cx={CIRCLE_CENTER.x}
                     cy={CIRCLE_CENTER.y}
                     r={90}
@@ -180,6 +189,7 @@ export function ArmControl({
                     stroke="#c777"
                     strokeWidth="14"
                     onClick={handleCircleClick}
+                    onTouchStart={handleCircleClick}
                 />
                 <g
                     transform={`rotate(${translateAngle(setAngle)} ${

@@ -32,6 +32,10 @@
     cursor: grab;
 }
 
+.circle {
+    cursor: pointer;
+}
+
 .angleInput {
     width: 70px;
     height: 35px;
