@@ -157,8 +157,9 @@ export function ArmControl({
     return (
         <div className={st.container}>
             <div className={st.currentAngle}>
-                {!!currentAngle &&
-                    parseFloat(currentAngle.toString()).toFixed(3)}
+                {currentAngle
+                    ? parseFloat(currentAngle.toString()).toFixed(3)
+                    : "0.000"}
                 &deg;
             </div>
             <div className={st.textLabels}>
