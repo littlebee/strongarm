@@ -5,16 +5,12 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import { findAngle } from "../util/angle_utils";
 import st from "./ArmAngleControl.module.css";
+import { IArmPart } from "../util/hubState";
 
 const CIRCLE_CENTER = { x: 100, y: 100 };
 
 interface ArmControlProps {
-    part: {
-        name: string;
-        motorRange?: number;
-        minAngle?: number;
-        maxAngle?: number;
-    };
+    part: IArmPart;
     currentAngle: number;
     setAngle: number;
     onSetAngle: (angle: number) => void;
@@ -140,7 +136,9 @@ export function ArmControl({
     return (
         <div className={st.container}>
             <div className={st.currentAngle}>
-                {parseFloat(currentAngle.toString()).toFixed(3)}&deg;
+                {!!currentAngle &&
+                    parseFloat(currentAngle.toString()).toFixed(3)}
+                &deg;
             </div>
             <div className={st.textLabels}>
                 <label>{part.name}</label>

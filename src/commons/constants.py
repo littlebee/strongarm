@@ -41,8 +41,8 @@ HUB_URI = f"ws://127.0.0.1:{HUB_PORT}/ws"
 
 LOG_ALL_MESSAGES = env_bool("LOG_ALL_MESSAGES", False)
 
-ARM_CONFIGS_DIR = env_string("ARM_CONFIGS_DIR", "./src/webapp/public/arm-configs")
-ARM_PARTS_DIR = env_string("ARM_PARTS_DIR", "./src/webapp/public/arm-parts")
+ARM_CONFIGS_DIR = env_string("ARM_CONFIGS_DIR", "./src/webapp_vite/public/arm-configs")
+ARM_PARTS_DIR = env_string("ARM_PARTS_DIR", "./src/webapp_vite/public/arm-parts")
 
 DEFAULT_MOTOR_RANGE = env_int("DEFAULT_MOTOR_RANGE", 270)
 DEFAULT_MIN_ANGLE = env_int("DEFAULT_MIN_ANGLE", 0)

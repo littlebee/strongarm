@@ -175,15 +175,22 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
 function startHubMonitor() {
     stopHubMonitor();
     hubMonitor = setInterval(() => {
-        // if the socket is hung or there is no network,
-        // the websocket will not error out until we send something
-        webSocket!.send(JSON.stringify({ type: "ping" }));
+        try {
+            // if the socket is hung or there is no network,
+            // the websocket will not error out until we send something
+            webSocket!.send(JSON.stringify({ type: "ping" }));
 
-        if (
-            __hub_state.hubConnStatus === "online" &&
-            Date.now() - lastHubUpdate > MIN_HUB_UPDATE_INTERVAL
-        ) {
-            setHubConnStatus("offline");
+            if (
+                __hub_state.hubConnStatus === "online" &&
+                Date.now() - lastHubUpdate > MIN_HUB_UPDATE_INTERVAL
+            ) {
+                setHubConnStatus("offline");
+            }
+        } catch (e) {
+            // will get caught by the close if there is a problem
+            // but if we send above before while the socket is connecting
+            // it will throw a spurious error
+            console.error("error pinging central-hub", e);
         }
     }, HUB_PING_INTERVAL);
 }
@@ -191,6 +198,7 @@ function startHubMonitor() {
 function stopHubMonitor() {
     if (hubMonitor) {
         clearInterval(hubMonitor);
+        hubMonitor = null;
     }
 }
 
