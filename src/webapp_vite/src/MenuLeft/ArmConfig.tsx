@@ -1,15 +1,11 @@
 import { useCallback } from "react";
 
 import { sendArmConfigSelected } from "../util/hubMessages";
+import { IHubState } from "../util/hubState";
 import st from "./ArmConfig.module.css";
 
 interface ArmConfigProps {
-    hubState: {
-        arm_config_files: string[];
-        arm_config: {
-            filename: string;
-        };
-    };
+    hubState: IHubState;
 }
 
 export function ArmConfig({ hubState }: ArmConfigProps) {
