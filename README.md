@@ -36,7 +36,7 @@ The software and docs for my robotic arm.
 
 ## Physical build parts needed.
 
-### 3d print the files in `src/webapp/public/arm-parts`
+### 3d print the files in `src/webapp_vite/public/arm-parts`
 ### Go shopping:
 Note that I receive no compensation of any form from Amazon, it's just the one place where I know you can find all of these parts.  Please do shop around.  Temu and others have some of these parts for half as much.
 
@@ -168,9 +168,9 @@ If you find a missing package, please be a sport and add it to `setup.sh` and su
 
 The backend components are written in Python and the web UI served from the bot's Raspberry PI is in Javascript and React.
 
-The [.stl files](https://github.com/littlebee/strongarm/tree/af9a326e82ebd4c26b2b3a7a883eda1c00eed1a0/src/webapp/public/arm-configs) for the 3d parts I designed in Fusion 360 are actually used along with [three.js](https://threejs.org/) to render the arm in the web UI.  You can 3d print the parts from the .stl files directly from the .stl files in src/webapp/putlic/arm-parts.  For my build pictured, I used Bambu Labs PLA-CF filament, at 0.2mm line height with 50% rectilinier infill.
+The [.stl files](https://github.com/littlebee/strongarm/tree/79ba6f7243c4ec0955e1ae1eabb3a3f58b2f47bb/src/webapp_vite/public/arm-parts) for the 3d parts I designed in Fusion 360 are used along with [three.js](https://threejs.org/) to render the arm in the web UI.  You can 3d print the parts from the .stl files directly from the .stl files in src/webapp_vite/putlic/arm-parts.  For my build pictured, I used Bambu Labs PLA-CF filament, at 0.2mm line height with 50% rectilinier infill.
 
-You can also add different arm configurations, say if you want another 80mm segment or a different effector, you can easily add your own arm config JSON file to the [arm-configs folder](https://github.com/littlebee/strongarm/tree/main/src/webapp/public/arm-configs)
+You can also add different arm configurations, say if you want another 80mm segment or a different effector, you can easily add your own arm config JSON file to the [arm-configs folder](https://github.com/littlebee/strongarm/tree/main/src/webapp_vite/public/arm-configs)
 
 ### Central Hub
 
