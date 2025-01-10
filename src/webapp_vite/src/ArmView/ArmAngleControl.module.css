@@ -1,0 +1,40 @@
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    user-select: none;
+}
+
+.textLabels {
+    display: flex;
+    min-width: 100px;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 18px;
+}
+
+.currentAngle {
+    position: absolute;
+    top: 90px;
+    left: 150px;
+    font-size: 18px;
+}
+
+.angleInputContainer {
+    display: flex;
+    flex-direction: row;
+    font-size: xx-large;
+    align-items: baseline;
+}
+
+.grabber {
+    cursor: grab;
+}
+
+.angleInput {
+    width: 70px;
+    height: 35px;
+    font-size: large;
+    background-color: rgb(216, 234, 255);
+}
