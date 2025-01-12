@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 
 import {
     DEFAULT_HUB_STATE,
+    DEFAULT_HUB_PORT,
     connectToHub,
     addHubStateUpdatedListener,
     removeHubStateUpdatedListener,
-
-    IHubState
+    IHubState,
 } from "./util/hubState";
 
 import { Header } from "./Header";
@@ -15,17 +15,21 @@ import { HubStateDialog } from "./HubStateDialog";
 import { ArmView } from "./ArmView";
 import MenuLeft from "./MenuLeft";
 
+interface AppProps {
+    hubPort?: number;
+    autoReconnect?: boolean;
+}
 
-function App() {
+function App({ hubPort, autoReconnect }: AppProps) {
     const [hubState, setHubState] = useState<IHubState>(DEFAULT_HUB_STATE);
     const [isHubStateDialogOpen, setIsHubStateDialogOpen] = useState(false);
 
     useEffect(() => {
         addHubStateUpdatedListener(handleHubStateUpdated);
-        connectToHub();
+        connectToHub({ port: hubPort, autoReconnect });
 
         return () => removeHubStateUpdatedListener(handleHubStateUpdated);
-    }, []);
+    }, [hubPort]);
 
     const handleHubStateUpdated = (newState: IHubState) => {
         setHubState({ ...newState });

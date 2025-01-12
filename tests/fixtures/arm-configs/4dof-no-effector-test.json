@@ -1,0 +1,10 @@
+{
+    "description": "Bare bones 4dof arm",
+    "arm_parts": [
+        "turntable-bottom.json",
+        "turntable-top.json",
+        "140mm-arm.json",
+        "80mm-arm.json",
+        "forearm.json"
+    ]
+}

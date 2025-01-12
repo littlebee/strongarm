@@ -1,0 +1,18 @@
+{
+    "name": "arm-segment-1",
+    "file": "140mm-arm.stl",
+    "position": {
+        "x": 0,
+        "y": 0,
+        "z": 150
+    },
+    "rotationOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 120
+    },
+    "motorRange": 270,
+    "minAngle": 30,
+    "maxAngle": 240
+
+}

@@ -1,0 +1,13 @@
+{
+    "description": "4dof arm with iPhone pan and tilt holder (for auto testing)",
+    "arm_parts": [
+        "turntable-bottom.json",
+        "turntable-top.json",
+        "140mm-arm.json",
+        "80mm-arm.json",
+        "forearm.json",
+        "pan-tilt-base.json",
+        "pan-tilt-rotator.json",
+        "iphone-holder.json"
+    ]
+}

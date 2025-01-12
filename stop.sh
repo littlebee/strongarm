@@ -41,7 +41,8 @@ do
     pid_file="./$base_name.pid"
     if [ "$STRONGARM_ENV" == "test" ]; then
         echo "stopping test mode process..."
-        pid_file="./test_$base_name.pid"
+        append="$STRONGARM_FILE_APPEND"
+        pid_file="./test_$base_name.$append.pid"
     fi
 
     if [ -f "$pid_file" ]; then
@@ -51,7 +52,7 @@ do
             rm -f $pid_file
         else
             echo "kill failed for $sub_system."
-            echo "Maybe retry using sudo ./stop.sh and if that fails, manually delete the .pid file"
+            echo "Maybe retry using sudo ./stop.sh and if that fails, manually delete the .pid file ($pid_file)"
         fi
     else
         echo "$pid_file does not exist. skipping"
