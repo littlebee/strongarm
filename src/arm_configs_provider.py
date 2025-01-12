@@ -22,6 +22,7 @@ connected_socket = None
 
 def load_arm_config_filenames():
     global arm_config_files
+    log.info(f"loading arm_configs from {c.ARM_CONFIGS_DIR}")
     arm_config_files = [f for f in os.listdir(c.ARM_CONFIGS_DIR) if f.endswith(".json")]
     log.info(f"loaded arm_configs: {arm_config_files}")
     return arm_config_files
@@ -42,7 +43,7 @@ async def initialize_arm_configs():
     load_arm_config_filenames()
 
     config_file = None
-    if os.path.exists(SAVED_CONFIG_FILE):
+    if not c.STRONGARM_ENV == "test" and os.path.exists(SAVED_CONFIG_FILE):
         with open(SAVED_CONFIG_FILE, "r") as f:
             config_file = f.read()
     else:
@@ -52,6 +53,7 @@ async def initialize_arm_configs():
 
 
 async def load_arm_config(arm_config_json_file):
+
     with open(f"{c.ARM_CONFIGS_DIR}/{arm_config_json_file}") as f:
         global current_arm_config
         loaded_arm_config = json.load(f)

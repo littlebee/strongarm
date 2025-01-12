@@ -18,8 +18,6 @@ export function ArmView({ hubState }: ArmViewProps) {
         [hubState.arm_config.arm_parts]
     );
 
-    console.log("ArmView", { parts });
-
     return (
         <div className={st.container}>
             <div className={st.visualization}>

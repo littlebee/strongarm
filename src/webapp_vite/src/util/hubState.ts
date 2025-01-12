@@ -1,4 +1,5 @@
 import "react";
+import { au } from "vitest/dist/chunks/reporters.D7Jzd9GS.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const debugThings = urlParams.get("debug")?.split(",") || [];
@@ -12,9 +13,7 @@ const HUB_PING_INTERVAL = 1000;
 // messages from hub.  Otherwise, we show "offline"
 const MIN_HUB_UPDATE_INTERVAL = 1500;
 
-export const HUB_PORT = 5800;
-export const HUB_HOST = `${window.location.hostname}:${HUB_PORT}`;
-export const HUB_URL = `ws://${HUB_HOST}/ws`;
+export const DEFAULT_HUB_PORT = 5800;
 
 export interface IVec3 {
     x: number;
@@ -97,6 +96,7 @@ export const DEFAULT_HUB_STATE: IHubState = {
 };
 
 const __hub_state: IHubState = { ...DEFAULT_HUB_STATE };
+const __hub_port: number = DEFAULT_HUB_PORT;
 
 const onUpdateCallbacks: Array<(state: IHubState) => void> = [];
 let hubStatePromises: Array<(state: IHubState) => void> = [];
@@ -105,12 +105,22 @@ let hubMonitor: number | null = null;
 
 export let webSocket: WebSocket | null = null;
 
-export function connectToHub(state = DEFAULT_HUB_STATE) {
+export interface ConnectToHubOptions {
+    port?: number;
+    state?: IHubState;
+    autoReconnect?: boolean;
+}
+
+export function connectToHub({
+    port = DEFAULT_HUB_PORT,
+    state = DEFAULT_HUB_STATE,
+    autoReconnect = true,
+}: ConnectToHubOptions) {
     try {
         setHubConnStatus("connecting");
-        console.log(`connecting to central-hub at ${HUB_URL}`);
-
-        webSocket = new WebSocket(HUB_URL);
+        const hubUrl = `ws://${window.location.hostname}:${port}/ws`;
+        console.log(`connecting to central-hub at ${hubUrl}`);
+        webSocket = new WebSocket(hubUrl);
 
         webSocket.addEventListener("open", function () {
             lastHubUpdate = Date.now();
@@ -135,10 +145,12 @@ export function connectToHub(state = DEFAULT_HUB_STATE) {
         });
 
         webSocket.addEventListener("close", function (event) {
-            onConnError(
-                state,
-                new Error(`websocket close code: ${event.code}`)
-            );
+            if (autoReconnect) {
+                onConnError(
+                    state,
+                    new Error(`websocket close code: ${event.code}`)
+                );
+            }
         });
 
         webSocket.addEventListener("message", function (event) {
@@ -237,7 +249,7 @@ export function updateSharedState(newState: IHubState) {
 function delayedConnectToHub(state: IHubState) {
     setTimeout(() => {
         if (state.hubConnStatus === "offline") {
-            connectToHub(state);
+            connectToHub(__hub_port, state);
         }
     }, 5000);
 }

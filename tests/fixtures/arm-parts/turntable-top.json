@@ -1,0 +1,13 @@
+{
+    "name": "turntable",
+    "file": "turntable-top.stl",
+    "position": {
+        "x": 0,
+        "y": -27,
+        "z": 50
+    },
+    "invertRotation": true,
+    "rotationAxis": "z",
+    "motorRange": 270
+
+}

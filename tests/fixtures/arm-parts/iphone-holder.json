@@ -1,0 +1,22 @@
+{
+    "name": "iphone-holder",
+    "file": "iphone-holder.stl",
+    "position": {
+        "x": 0,
+        "y": -20,
+        "z": 120
+    },
+    "initialRotation": {
+        "x": 0,
+        "y": 0,
+        "z": 90
+    },
+    "invertRotation": true,
+    "rotationAxis": "z",
+    "rotationOffset": {
+        "x": 0,
+        "y": -20,
+        "z": 0
+    },
+    "motorRange": 270
+}

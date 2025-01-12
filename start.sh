@@ -30,6 +30,11 @@ declare -a to_start=()
 
 export LOG_ALL_MESSAGES=1
 
+if [ "$STRONGARM_ENV" == "test" ]; then
+    export ARM_CONFIGS_DIR="./tests/fixtures/arm-configs"
+    export ARM_PARTS_DIR="./tests/fixtures/arm-parts"
+fi
+
 if [ $# -ne 0 ]; then
     to_start=($@)
     sleep=0
@@ -66,8 +71,9 @@ do
 
     if [ "$STRONGARM_ENV" == "test" ]; then
         echo "running $sub_system in test mode"
-        logfile="./logs/test_$base_name.log"
-        pid_file="./test_$base_name.pid"
+        append="$STRONGARM_FILE_APPEND"
+        logfile="./logs/test_$base_name.$append.log"
+        pid_file="./test_$base_name.$append.pid"
     fi
 
     if [ -f "$logfile" ]; then
