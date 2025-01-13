@@ -43,16 +43,18 @@ async def initialize_arm_configs():
     load_arm_config_filenames()
 
     config_file = None
-    if not c.STRONGARM_ENV == "test" and os.path.exists(SAVED_CONFIG_FILE):
+    if c.STRONGARM_ENV != "test" and os.path.exists(SAVED_CONFIG_FILE):
         with open(SAVED_CONFIG_FILE, "r") as f:
             config_file = f.read()
     else:
+        log.info(f"loading first arm_config: {arm_config_files}")
         config_file = arm_config_files[0]
 
     await load_arm_config(config_file)
 
 
 async def load_arm_config(arm_config_json_file):
+    log.info("loading arm_config: " + arm_config_json_file)
 
     with open(f"{c.ARM_CONFIGS_DIR}/{arm_config_json_file}") as f:
         global current_arm_config
@@ -75,8 +77,10 @@ async def load_arm_config(arm_config_json_file):
             current_arm_config["arm_parts"].append(new_arm_part)
 
         log.info(f"loaded arm config: {current_arm_config}")
-        with open(SAVED_CONFIG_FILE, "w") as f:
-            f.write(arm_config_json_file)
+
+        if c.STRONGARM_ENV != "test":
+            with open(SAVED_CONFIG_FILE, "w") as f:
+                f.write(arm_config_json_file)
 
 
 async def send_arm_config(websocket):

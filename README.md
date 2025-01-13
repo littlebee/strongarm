@@ -194,10 +194,13 @@ example json:
 ```json
 {
   "type": "getState"
+  "data": ["keyName", "keyName"]
 }
 ```
-
 Causes `central-hub` to send the full state via message type = "state" to the requesting client socket.
+
+`data` is optional, if specified, should be array of key names to retrieve. If omitted, all keys (complete state) is sent.
+
 
 ### identity
 

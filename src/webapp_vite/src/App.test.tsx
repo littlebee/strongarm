@@ -40,9 +40,11 @@ describe("App", () => {
         act(() => armConfigButton.click());
         await waitFor(() => screen.getByText(/select arm config/i));
 
-        const expectedSelected = screen.getByText(
-            /4dof-no-effector-test.json/i
+        const expectedSelected = await waitFor(() =>
+            screen.getByText(/4dof-no-effector-test.json/i)
         );
+
+        // console.log("expectedSelected: ", expectedSelected.outerHTML);
         expect(expectedSelected.className).toContain("selected");
 
         const otherConfig = screen.getByText(/4dof-iphone-test.json/i);

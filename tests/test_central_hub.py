@@ -40,6 +40,22 @@ class TestCentralHub:
         assert updated_state["data"]["set_angles"] == TEST_ANGLES_1
         ws.close()
 
+    def test_get_partial_state(self):
+        ws = hub.connect()
+
+        # make sure greater than one key is returned for full state request
+        hub.send(ws, {"type": "getState"})
+        initial_state = hub.recv(ws)
+        assert len(initial_state["data"].keys()) > 1
+        assert initial_state["data"]["set_angles"]
+        assert initial_state["data"]["hub_stats"]
+
+        hub.send(ws, {"type": "getState", "data": ["set_angles"]})
+        initial_state = hub.recv(ws)
+        assert len(initial_state["data"].keys()) == 1
+        assert initial_state["data"]["set_angles"]
+        ws.close()
+
     def test_pubsub(self):
         ws1 = hub.connect("test_client_1")
         hub.send_subscribe(ws1, ["set_angles", "current_angles"])

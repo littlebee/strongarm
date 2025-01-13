@@ -13,24 +13,23 @@ export function ArmConfig({ hubState }: ArmConfigProps) {
         sendArmConfigSelected(file);
     }, []);
 
-    console.log("rendering ArmConfig", { hubState });
     return (
         <div className={st.container}>
             <div className={st.title}>Select arm config</div>
             <div>
                 {hubState.arm_config_files.map((file, index) => (
-                    <div key={index}>
-                        <a
-                            onClick={() => handleArmConfigClick(file)}
-                            className={
-                                (file === hubState.arm_config.filename &&
-                                    "selected") ||
-                                ""
-                            }
-                        >
-                            {file}
-                        </a>
-                    </div>
+                    <a
+                        key={index}
+                        data-testid="selectable-arm-config"
+                        onClick={() => handleArmConfigClick(file)}
+                        className={
+                            (file === hubState.arm_config.filename &&
+                                "selected") ||
+                            ""
+                        }
+                    >
+                        {file}
+                    </a>
                 ))}
             </div>
         </div>

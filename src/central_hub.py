@@ -79,8 +79,8 @@ async def send_state_update_to_subscribers(message_data):
         socket.close()
 
 
-async def notify_state(websocket="all"):
-    await send_message(websocket, hub_state.serialize_state())
+async def notify_state(websocket="all", keysRequested=None):
+    await send_message(websocket, hub_state.serialize_state(keysRequested))
 
 
 # NOTE that there is no "all" option here, need a websocket,
@@ -124,8 +124,8 @@ async def unregister(websocket):
         pass
 
 
-async def handle_state_request(websocket):
-    await notify_state(websocket)
+async def handle_state_request(websocket, keysRequested=None):
+    await notify_state(websocket, keysRequested)
 
 
 async def handle_state_update(message_data):
@@ -194,9 +194,9 @@ async def handle_message(websocket):
             if constants.LOG_ALL_MESSAGES and messageType != "ping":
                 log.info(f"received {message} from {websocket.remote_address[1]}")
 
-            # {type: "state"}
+            # {type: "getState, data: [state_keys] or omitted}
             if messageType == "getState":
-                await handle_state_request(websocket)
+                await handle_state_request(websocket, messageData)
             # {type: "updateState" data: { new state }}
             elif messageType == "updateState":
                 await handle_state_update(messageData)

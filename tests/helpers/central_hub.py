@@ -45,7 +45,9 @@ def send_subscribe(ws, namesList):
 
 
 def recv(ws):
-    return json.loads(ws.recv())
+    message = json.loads(ws.recv())
+    print(f"test helper received: {message}")
+    return message
 
 
 def has_received_data(ws):
