@@ -1,6 +1,10 @@
+#!/bin/sh
 # test.sh
 
+# backend tests
 STRONGARM_ENV=test pytest $@
 
 
-# TODO : think about starting and stopping the system from here
+cd src/webapp_vite
+STRONGARM_ENV=test yarn run test $@
+

@@ -34,7 +34,7 @@ def stop_services(service_list: List[str]):
     """
 
     for service_name in service_list:
-        exit_code = os.system(f"./stop.sh src/{service_name}.py")
+        exit_code = os.system(f"STRONGARM_ENV=test ./stop.sh src/{service_name}.py")
 
         # note that this only shows up when a test module fails
         # I contemplated adding a print statement here to instruct the tester to

@@ -71,9 +71,9 @@ do
 
     if [ "$STRONGARM_ENV" == "test" ]; then
         echo "running $sub_system in test mode"
-        append="$STRONGARM_FILE_APPEND"
-        logfile="./logs/test_$base_name.$append.log"
-        pid_file="./test_$base_name.$append.pid"
+        append=$STRONGARM_FILE_APPEND
+        logfile="./logs/test_$base_name$append.log"
+        pid_file="./test_$base_name$append.pid"
     fi
 
     if [ -f "$logfile" ]; then

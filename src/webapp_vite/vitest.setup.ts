@@ -19,10 +19,12 @@ beforeAll(async () => {
     const threadId = process.env.VITEST_POOL_ID;
 
     globalThis.hubPort = port;
-    console.log("vitest.setup.ts beforeAll: starting services");
-    const { stdout, stderr } = await execAsync(
-        `cd ../.. && STRONGARM_ENV=test STRONGARM_FILE_APPEND=${threadId} HUB_PORT=${port} ./start.sh`
+
+    const cmd = `cd ../.. && STRONGARM_ENV=test STRONGARM_FILE_APPEND=${threadId} HUB_PORT=${port} ./start.sh`;
+    console.log(
+        `vitest.setup.ts beforeAll: starting services with command '${cmd}'`
     );
+    const { stdout, stderr } = await execAsync(cmd);
     console.log(`vitest.setup.ts beforeAll start.sh stdout: ${stdout}`);
     console.error(`vitest.setup.ts beforeAll start.sh stderr: ${stderr}`);
 });

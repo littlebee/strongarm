@@ -1,5 +1,4 @@
 import "react";
-import { au } from "vitest/dist/chunks/reporters.D7Jzd9GS.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const debugThings = urlParams.get("debug")?.split(",") || [];
@@ -249,7 +248,7 @@ export function updateSharedState(newState: IHubState) {
 function delayedConnectToHub(state: IHubState) {
     setTimeout(() => {
         if (state.hubConnStatus === "offline") {
-            connectToHub(__hub_port, state);
+            connectToHub({ port: __hub_port, state });
         }
     }, 5000);
 }

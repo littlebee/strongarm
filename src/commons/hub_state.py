@@ -90,10 +90,15 @@ def persist_state() -> None:
         log.error(f"Failed to persist state: {e}")
 
 
-def serialize_state() -> str:
+def serialize_state(keysRequested=None) -> str:
     """Serialize current state to JSON string."""
+
+    requestedState = state
+    if keysRequested:
+        requestedState = {key: state[key] for key in keysRequested if key in state}
+
     try:
-        return json.dumps({"type": "state", "data": state})
+        return json.dumps({"type": "state", "data": requestedState})
     except json.JSONDecodeError as e:
         log.error(f"Failed to serialize state: {e}")
         return json.dumps({"type": "state", "data": {}})
