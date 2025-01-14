@@ -36,10 +36,10 @@ class TestStrongarm:
         ws.close()
 
     def test_clamped_angles_change(self):
-        test_angles = [-40, 55, 400, 115]
-        # these are based on current_arm_config being 4dof-no-effector-test.json
+        test_angles = [-40, 55, 400, 115, 95, 5]
+        # these are based on current_arm_config being 4dof-iphone.json
         # and its respective part files. 240 is the max for the 3rd movable part
-        expected_clamped_angles = [0, 55, 240, 115]
+        expected_clamped_angles = [0, 55, 240, 115, 95, 5]
         ws = hub.connect()
         hub.send_subscribe(ws, ["set_angles", "current_angles"])
         hub.send(ws, {"type": "getState"})
@@ -64,6 +64,6 @@ class TestStrongarm:
         updated_state = hub.recv(ws)
         updated_current_angles = updated_state["data"]["current_angles"]
         print(f"Received updated state: {updated_state=}")
-        assert updated_current_angles and len(updated_current_angles) == 4
+        assert updated_current_angles and len(updated_current_angles) == 6
 
         ws.close()
