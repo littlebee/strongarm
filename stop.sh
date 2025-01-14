@@ -36,14 +36,15 @@ do
 
     base_name=$(basename $sub_system)
     logfile="./logs/$base_name.log"
-    echo "stopping $sub_system at $(date)" >> "$logfile"
-
     pid_file="./$base_name.pid"
     if [ "$STRONGARM_ENV" == "test" ]; then
         echo "stopping test mode process..."
         append=$STRONGARM_FILE_APPEND
+        logfile="./logs/test_$base_name$append.log"
         pid_file="./test_$base_name$append.pid"
     fi
+    echo "stopping $sub_system at $(date)" >> "$logfile"
+
 
     if [ -f "$pid_file" ]; then
         kill -15 `cat $pid_file`

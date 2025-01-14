@@ -60,6 +60,7 @@ class TestArmConfigsProvider:
         assert initial_state["data"]["arm_config"]
         assert len(initial_state["data"]["arm_config"]["arm_parts"]) > 1
         assert len(initial_state["data"]["arm_config_files"]) > 1
+        assert len(initial_state["data"]["arm_config_selected"]) > 1
 
         return initial_state
 
