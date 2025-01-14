@@ -100,7 +100,7 @@ const __hub_port: number = DEFAULT_HUB_PORT;
 const onUpdateCallbacks: Array<(state: IHubState) => void> = [];
 let hubStatePromises: Array<(state: IHubState) => void> = [];
 let lastHubUpdate = Date.now();
-let hubMonitor: number | null = null;
+let hubMonitor: NodeJS.Timeout | null = null;
 
 export let webSocket: WebSocket | null = null;
 
