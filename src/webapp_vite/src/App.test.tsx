@@ -1,9 +1,8 @@
-import { describe, it, vi, expect, beforeAll } from "vitest";
+import { describe, it, vi, expect, beforeAll, afterAll } from "vitest";
 import { render, screen, waitFor, act } from "@testing-library/react";
 
-import { getHubPort } from "./testHelpers/globalContext";
-
-// import { sendHubStateUpdate } from "./util/hubMessages";
+import { getHubPort } from "../testHelpers/globalContext";
+import { startServices, stopServices } from "../testHelpers/startStop";
 
 import App from "./App";
 
@@ -23,7 +22,13 @@ async function renderApp() {
 }
 
 describe("App", () => {
-    beforeAll(async () => {});
+    beforeAll(async () => {
+        await startServices();
+    });
+
+    afterAll(async () => {
+        await stopServices();
+    });
 
     it("renders the App component", async () => {
         await renderApp();
@@ -41,20 +46,20 @@ describe("App", () => {
         await waitFor(() => screen.getByText(/select arm config/i));
 
         const expectedSelected = await waitFor(() =>
-            screen.getByText(/4dof-no-effector-test.json/i)
+            screen.getByText(/4dof-iphone-test.json/i)
         );
 
         // console.log("expectedSelected: ", expectedSelected.outerHTML);
         expect(expectedSelected.className).toContain("selected");
 
-        const otherConfig = screen.getByText(/4dof-iphone-test.json/i);
+        const otherConfig = screen.getByText(/4dof-no-effector-test.json/i);
         expect(otherConfig.className).not.toContain("selected");
 
         act(() => otherConfig.click());
         // we need to wait for the state to update which should happen within 100ms
         await new Promise((r) => setTimeout(r, 100));
         const newlySelected = await waitFor(() =>
-            screen.getByText(/4dof-iphone-test.json/i)
+            screen.getByText(/4dof-no-effector-test.json/i)
         );
         expect(newlySelected.className).toContain("selected");
 
