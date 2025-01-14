@@ -22,7 +22,7 @@ CORS(app, supports_credentials=True)
 
 _hub_state_monitor = HubStateMonitor("webserver", "*")
 
-dir_path = os.path.dirname(os.path.realpath(__file__)) + "/webapp/build"
+dir_path = os.path.dirname(os.path.realpath(__file__)) + "/webapp_vite/dist"
 
 
 @app.route("/stats")
