@@ -43,7 +43,7 @@ def stop_services(service_list: List[str]):
         # the end of the test module, this preserves the logs of the failing test
         print(f"\n {service_name} subsystem logs")
         print("===================================================================")
-        os.system(f"cat logs/{service_name}.py.log")
+        os.system(f"cat logs/test_{service_name}.py.log")
         print("===================================================================")
 
         assert exit_code == 0
