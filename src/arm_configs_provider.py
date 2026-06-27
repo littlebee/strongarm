@@ -38,15 +38,22 @@ async def load_and_send_arm_config_filenames(websocket):
     await send_arm_config_filenames(websocket)
 
 
-async def load_arm_config(arm_config_json_file):
-    log.info("loading arm_config: " + arm_config_json_file)
+async def load_arm_config(websocket, arm_config_json_file):
+    actual_config_json_file = arm_config_json_file
+    if not arm_config_json_file or arm_config_json_file not in arm_config_files:
+        log.error(
+            f"invalid arm_config_json_file: {arm_config_json_file}.  sending first arm_config file as default"
+        )
+        actual_config_json_file = arm_config_files[0]
 
-    with open(f"{c.ARM_CONFIGS_DIR}/{arm_config_json_file}") as f:
+    log.info("loading arm_config: " + actual_config_json_file)
+
+    with open(f"{c.ARM_CONFIGS_DIR}/{actual_config_json_file}") as f:
         global current_arm_config
-        log.info(f"loading arm config: {arm_config_json_file}")
+        log.info(f"loading arm config: {actual_config_json_file}")
         loaded_arm_config = json.load(f)
         current_arm_config = {
-            "filename": arm_config_json_file,
+            "filename": actual_config_json_file,
             "updated_at": time.time(),
             "description": loaded_arm_config["description"],
             "arm_parts": [],
@@ -62,6 +69,12 @@ async def load_arm_config(arm_config_json_file):
                 new_arm_part.update(loaded_part_file)
             current_arm_config["arm_parts"].append(new_arm_part)
 
+        # if we corrected the arm_config_json_file, send the corrected one
+        if actual_config_json_file != arm_config_json_file:
+            await messages.send_state_update(
+                websocket, {"arm_config_selected": actual_config_json_file}
+            )
+
         log.info(f"loaded arm config: {current_arm_config}")
 
 
@@ -72,7 +85,7 @@ async def send_arm_config(websocket):
 
 
 async def load_and_send_arm_config(websocket, arm_config_json_file):
-    await load_arm_config(arm_config_json_file)
+    await load_arm_config(websocket, arm_config_json_file)
     await send_arm_config(websocket)
 
 
@@ -95,7 +108,7 @@ async def handle_selected_arm_config(websocket, message_data):
         ):
             log.info(f"changing arm_config to {arm_config_selected}")
             try:
-                await load_arm_config(arm_config_selected)
+                await load_arm_config(websocket, arm_config_selected)
                 await send_arm_config(websocket)
 
             except:
